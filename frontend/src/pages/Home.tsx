@@ -21,7 +21,6 @@ interface Cover {
 
 export default function Home() {
   const posts = usePosts();
-  const [cover, setCover] = useState<boolean>(true);
   const [covers, setCovers] = useState<Cover[]>([]);
   const [pinnedCover, setPinnedCover] = useState<Cover | null>(null);
 
@@ -33,28 +32,31 @@ export default function Home() {
 
   const fetchCovers = async () => {
     try {
-      const response = await axios.get('/covers');
+      // Obtener todas las portadas
+      const response = await axios.get("/covers");
       setCovers(response.data);
-      const pinned = response.data.find((c: Cover) => c.pinned);
-      setPinnedCover(pinned || null);
+
+      // Obtener la portada fijada más reciente
+      const pinnedResponse = await axios.get("/covers/pinned");
+      setPinnedCover(pinnedResponse.data);
     } catch (error) {
-      console.error('Failed to fetch covers:', error);
+      console.error("Failed to fetch covers:", error);
     }
   };
 
   return (
     <div className="w-full text-[#1E1E1E] overflow-hidden">
-      {cover && (
+      {pinnedCover && (
         <div className="fixed z-50 top-0 left-0 flex justify-center items-center p-6 w-screen h-screen bg-[#0008]">
           <div className="relative max-w-full max-h-full flex justify-center items-center">
             <button
               className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white"
-              onClick={() => setCover(false)}
+              onClick={() => setPinnedCover(null)}
             >
               x
             </button>
             <img
-              src={pinnedCover?.imageUrl || "https://faustinee.com/uploads/portada-septiembre-2025.png"}
+              src={pinnedCover?.imageUrl}
               alt="cover"
               className="max-w-full max-h-full object-contain"
               style={{

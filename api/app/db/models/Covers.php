@@ -7,16 +7,14 @@ require_once dirname(__DIR__, 3) . '/config/database.php';
 class Covers {
     private $id;
     private $title;
-    private $description;
     private $imageUrl;
     private $state;
     private $pinned;
     private $created_at;
 
-    public function __construct($id = null, $title = null, $description = null, $imageUrl = null, $state = null, $pinned = null, $created_at = null) {
+    public function __construct($id = null, $title = null, $imageUrl = null, $state = null, $pinned = null, $created_at = null) {
         $this->id = $id;
         $this->title = $title;
-        $this->description = $description;
         $this->imageUrl = $imageUrl;
         $this->state = $state ?: 'Publicado';
         $this->pinned = $pinned ?: false;
@@ -31,9 +29,6 @@ class Covers {
         return $this->title;
     }
 
-    public function getDescription() {
-        return $this->description;
-    }
 
     public function getImageUrl() {
         return $this->imageUrl;
@@ -51,9 +46,6 @@ class Covers {
         $this->title = $title;
     }
 
-    public function setDescription($description) {
-        $this->description = $description;
-    }
 
     public function setImageUrl($imageUrl) {
         $this->imageUrl = $imageUrl;
@@ -77,7 +69,7 @@ class Covers {
         $results = $stmt->fetchAll();
         $covers = [];
         foreach ($results as $row) {
-            $covers[] = new self($row['id'], $row['title'], $row['description'], $row['image_url'], $row['state'], $row['pinned'], $row['created_at'] ?? null);
+            $covers[] = new self($row['id'], $row['title'], $row['imageUrl'], $row['state'], $row['pinned'], $row['created_at'] ?? null);
         }
         return $covers;
     }
@@ -88,7 +80,7 @@ class Covers {
         $stmt->execute([$id]);
         $row = $stmt->fetch();
         if ($row) {
-            return new self($row['id'], $row['title'], $row['description'], $row['image_url'], $row['state'], $row['pinned'], $row['created_at'] ?? null);
+            return new self($row['id'], $row['title'], $row['imageUrl'], $row['state'], $row['pinned'], $row['created_at'] ?? null);
         }
         return null;
     }
@@ -97,15 +89,15 @@ class Covers {
         $pdo = getPDO();
         $id = self::generateUuid();
         $now = date('Y-m-d H:i:s');
-        $stmt = $pdo->prepare("INSERT INTO Covers (id, title, description, image_url, state, pinned, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)");
-        $stmt->execute([$id, $data['title'], $data['description'], $data['image_url'], $data['state'], $data['pinned'], $now]);
-        return new self($id, $data['title'], $data['description'], $data['image_url'], $data['state'], $data['pinned'], $now);
+        $stmt = $pdo->prepare("INSERT INTO Covers (id, title, imageUrl, state, pinned, created_at) VALUES (?, ?, ?, ?, ?, ?)");
+        $stmt->execute([$id, $data['title'], $data['imageUrl'], $data['state'], $data['pinned'], $now]);
+        return new self($id, $data['title'], $data['imageUrl'], $data['state'], $data['pinned'], $now);
     }
 
     public static function update($id, $data) {
         $pdo = getPDO();
-        $stmt = $pdo->prepare("UPDATE Covers SET title = ?, description = ?, image_url = ?, state = ?, pinned = ? WHERE id = ?");
-        return $stmt->execute([$data['title'], $data['description'], $data['image_url'], $data['state'], $data['pinned'], $id]);
+        $stmt = $pdo->prepare("UPDATE Covers SET title = ?, imageUrl = ?, state = ?, pinned = ? WHERE id = ?");
+        return $stmt->execute([$data['title'], $data['imageUrl'], $data['state'], $data['pinned'], $id]);
     }
 
     public static function delete($id) {

@@ -1,6 +1,8 @@
 export interface Cover {
-  id?: string;
+  id: string;
   title: string;
-  img: string;
-  date: Date | string;
+  imageUrl: string;
+  state: "Publicado" | "Oculto";
+  pinned: boolean;
+  created_at: string;
 }

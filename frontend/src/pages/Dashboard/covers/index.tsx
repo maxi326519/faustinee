@@ -1,27 +1,16 @@
 import { SquarePlus, Trash, Pin, Eye, EyeOff } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import { Cover } from "@/interfaces/Cover";
 import axios from "axios";
 import Swal from "sweetalert2";
-import Layout from "@/components/Dashboard/Layout";
 
-interface Cover {
-  id: string;
-  title: string;
-  description: string;
-  imageUrl: string;
-  state: "Publicado" | "Oculto";
-  pinned: boolean;
-}
+import Layout from "@/components/Dashboard/Layout";
+import CoverForm from "@/components/Dashboard/Forms/CoverForm";
 
 export default function CoversTable() {
   const [covers, setCovers] = useState<Cover[]>([]);
   const [isUploadOpen, setIsUploadOpen] = useState(false);
-  const [uploadData, setUploadData] = useState({
-    title: "",
-    description: "",
-    image: null as File | null,
-  });
 
   useEffect(() => {
     fetchCovers();
@@ -36,21 +25,24 @@ export default function CoversTable() {
     }
   };
 
-  const handleUpload = async () => {
-    if (!uploadData.title || !uploadData.image) return;
+  const handleUpload = async (data: { title: string; image: File | null }) => {
+    if (!data.title || !data.image) return;
 
     const formData = new FormData();
-    formData.append("title", uploadData.title);
-    formData.append("description", uploadData.description);
-    formData.append("image", uploadData.image);
+    formData.append("title", data.title);
+    formData.append("image", data.image);
 
     try {
-      await axios.post("/covers", formData);
+      await axios.post("/covers", formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
       setIsUploadOpen(false);
-      setUploadData({ title: "", description: "", image: null });
       fetchCovers();
       Swal.fire("Éxito", "Cover subido correctamente", "success");
     } catch (error) {
+      console.error(error);
       Swal.fire("Error", "No se pudo subir el cover", "error");
     }
   };
@@ -70,6 +62,7 @@ export default function CoversTable() {
       });
       fetchCovers();
     } catch (error) {
+      console.error(error);
       Swal.fire("Error", "No se pudo actualizar el pin", "error");
     }
   };
@@ -82,6 +75,7 @@ export default function CoversTable() {
       });
       fetchCovers();
     } catch (error) {
+      console.error(error);
       Swal.fire("Error", "No se pudo cambiar el estado", "error");
     }
   };
@@ -101,6 +95,7 @@ export default function CoversTable() {
         fetchCovers();
         Swal.fire("Eliminado", "Cover eliminado correctamente", "success");
       } catch (error) {
+        console.error(error);
         Swal.fire("Error", "No se pudo eliminar el cover", "error");
       }
     }
@@ -114,50 +109,11 @@ export default function CoversTable() {
           <SquarePlus /> Subir Nuevo Cover
         </Button>
 
-        {isUploadOpen && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-            <div className="bg-white p-6 rounded-lg w-96">
-              <h2 className="text-xl mb-4">Subir Cover</h2>
-              <input
-                type="text"
-                placeholder="Título"
-                value={uploadData.title}
-                onChange={(e) =>
-                  setUploadData({ ...uploadData, title: e.target.value })
-                }
-                className="w-full mb-2 p-2 border"
-              />
-              <textarea
-                placeholder="Descripción"
-                value={uploadData.description}
-                onChange={(e) =>
-                  setUploadData({ ...uploadData, description: e.target.value })
-                }
-                className="w-full mb-2 p-2 border"
-              />
-              <input
-                type="file"
-                accept="image/*"
-                onChange={(e) =>
-                  setUploadData({
-                    ...uploadData,
-                    image: e.target.files?.[0] || null,
-                  })
-                }
-                className="w-full mb-4"
-              />
-              <div className="flex gap-2">
-                <Button onClick={handleUpload}>Subir</Button>
-                <Button
-                  variant="outline"
-                  onClick={() => setIsUploadOpen(false)}
-                >
-                  Cancelar
-                </Button>
-              </div>
-            </div>
-          </div>
-        )}
+        <CoverForm
+          isOpen={isUploadOpen}
+          onClose={() => setIsUploadOpen(false)}
+          onSubmit={handleUpload}
+        />
 
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {covers.map((cover) => (
@@ -168,7 +124,6 @@ export default function CoversTable() {
                 className="w-full h-32 object-cover mb-2"
               />
               <h3 className="font-bold">{cover.title}</h3>
-              <p className="text-sm text-gray-600">{cover.description}</p>
               <p className="text-sm">Estado: {cover.state}</p>
               <p className="text-sm">Fijado: {cover.pinned ? "Sí" : "No"}</p>
               <div className="flex gap-2 mt-2">
