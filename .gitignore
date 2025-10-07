@@ -1,0 +1,18 @@
+# PACKAGE
+vendor
+node_modules
+package-lock.json
+
+# BUILDS
+dist
+lib
+build
+
+# LOGS
+*.log
+.vite
+
+# ENVS
+.env
+.env.development
+.env.production

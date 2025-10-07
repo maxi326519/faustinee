@@ -1,0 +1,75 @@
+figure {
+  margin: 1rem auto;
+  text-align: center;
+}
+
+figcaption {
+  font-size: 0.875rem;
+  color: #555;
+  margin-top: 0.25rem;
+}
+
+p {
+  font-family: "Work_Sans" !important;
+  /* font-weight: 100 !important; */
+}
+
+.ProserMirror h1,
+.ProserMirror h2,
+.ProserMirror h3,
+.ProserMirror h4,
+.ProserMirror h5,
+.ProserMirror h6 {
+  margin-top: 30px !important;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: "Libre_Caslon_Display" !important;
+  font-weight: 400 !important;
+}
+
+.Nota .columns .column {
+  border: none;
+  padding: 0;
+}
+
+.Nota .columns .column br {
+  display: none;
+}
+
+.ProseMirror img,
+.Nota img {
+  border-radius: 5px;
+}
+
+.ProseMirror p {
+  font-family: "Work_Sans" !important;
+  /* font-weight: 100 !important; */
+}
+
+.ProseMirror h2 {
+  font-family: "Libre_Caslon_Display" !important;
+  font-weight: 300 !important;
+}
+
+.Nota iframe,
+.ProseMirror iframe {
+  max-width: 600px;
+  min-height: 350px;
+  margin: auto;
+}
+
+.CustomFont {
+  font-family: "Tagerine" !important;
+}
+
+@media screen and (max-width: 800px) {
+  .Nota .columns {
+    flex-direction: column;
+  }
+}
