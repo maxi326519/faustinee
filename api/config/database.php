@@ -44,11 +44,11 @@ function getPDO()
   }
 
   // Usar variables de entorno con valores por defecto
-  $host = getenv('DB_HOST') ?: 'localhost';
-  $port = getenv('DB_PORT') ?: '3306';
-  $database = getenv('DB_NAME') ?: 'faustinee';
-  $username = getenv('DB_USER') ?: 'root';
-  $password = getenv('DB_PASS') ?: '';
+  $host = getenv('DB_HOST');
+  $port = getenv('DB_PORT');
+  $database = getenv('DB_NAME');
+  $username = getenv('DB_USER');
+  $password = getenv('DB_PASS');
 
   try {
     $dsn = "mysql:host={$host};port={$port};dbname={$database};charset=utf8mb4";

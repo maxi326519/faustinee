@@ -222,7 +222,6 @@ export default function PostTable() {
   );
 
   const handleSubmit = (post: Post, cover?: File | null) => {
-    console.log("onSave");
     if (selectedPost) {
       handleEditPost(post, cover!);
     } else {
@@ -366,7 +365,6 @@ export default function PostTable() {
             </Button>
             <Button
               onClick={() => {
-                console.log(postToChange, fixedHomeTemp, fixedCategoryTemp);
                 if (postToChange)
                   handleChangeFixed(
                     postToChange,

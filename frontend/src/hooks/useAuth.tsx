@@ -1,5 +1,5 @@
-import { useNavigate } from "react-router-dom";
 import { useEffect, useState, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import useSesionStore from "@/stores/sesionStore";
 import useLoading from "./useLoading";
@@ -49,6 +49,8 @@ export default function useAuth() {
         setIsLoading(false);
         return;
       }
+
+      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
       // Validar token con el servidor
       try {
@@ -107,6 +109,9 @@ export default function useAuth() {
       sesion.set(user);
       setIsAuthenticated(true);
 
+      // Agregar el token al header de axios para futuras peticiones
+      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+
       toast.success("Inicio de sesión exitoso");
       navigate("/panel/usuarios");
       loading.close();
@@ -132,6 +137,6 @@ export default function useAuth() {
     login,
     logout,
     checkLocalAuth,
-    validateWithServer, // Para usar en ProtectedRoute
+    validateWithServer,
   };
 }

@@ -5,6 +5,7 @@ import { useUsers } from "@/hooks/useUser";
 import { Button } from "@/components/ui/button";
 import useUserStore from "@/stores/usersStore";
 import Swal from "sweetalert2";
+
 import Layout from "@/components/Dashboard/Layout";
 import SearchFilter from "@/components/Dashboard/SearchFilter";
 import PaginatedTable from "@/components/Dashboard/PaginatedTable";
@@ -75,7 +76,6 @@ export default function UsersTable() {
 
   const handleEditUser = async (user: User) => {
     try {
-      // console.log("user", user);
       await update(user);
       setIsEditUserFormOpen(false);
       setSelectedUser(null);

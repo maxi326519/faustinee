@@ -12,11 +12,6 @@ export function useUsers() {
   const fetchUsers = useCallback(async () => {
     try {
       loading.open();
-      console.log(
-        "Obteniendo usuarios",
-        sessionStorage.getItem("token"),
-        axios.defaults.headers.common["Authorization"]
-      );
       const response = await axios.get("/users");
       if (!Array.isArray(response.data)) throw new Error("Invalid response");
       users.set(response.data);

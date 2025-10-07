@@ -9,16 +9,66 @@ export function usePosts() {
   const loading = useLoading();
   const posts = usePostStore();
 
+  const compressImage = (file: File, maxSizeMB: number = 5): Promise<File> => {
+    return new Promise((resolve) => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const img = new Image();
+      
+      img.onload = () => {
+        // Calcular nuevas dimensiones manteniendo proporción
+        let { width, height } = img;
+        const maxSize = maxSizeMB * 1024 * 1024; // Convertir a bytes
+        
+        // Si la imagen es muy grande, reducir tamaño
+        if (file.size > maxSize) {
+          const ratio = Math.sqrt(maxSize / file.size);
+          width *= ratio;
+          height *= ratio;
+        }
+        
+        canvas.width = width;
+        canvas.height = height;
+        
+        // Dibujar imagen redimensionada
+        ctx?.drawImage(img, 0, 0, width, height);
+        
+        // Convertir a blob con compresión
+        canvas.toBlob((blob) => {
+          if (blob) {
+            const compressedFile = new File([blob], file.name, {
+              type: 'image/jpeg',
+              lastModified: Date.now()
+            });
+            resolve(compressedFile);
+          } else {
+            resolve(file); // Fallback al archivo original
+          }
+        }, 'image/jpeg', 0.8); // 80% de calidad
+      };
+      
+      img.src = URL.createObjectURL(file);
+    });
+  };
+
   const uploadImage = async (
     img: File,
     postId: string
   ): Promise<string | undefined> => {
-    const formData = new FormData();
-    formData.append("file", img);
-    const response = await axios.post(`/posts/${postId}/img`, formData);
-    if (!response.data.url) throw new Error("Error to upload this image");
+    try {
+      // Comprimir imagen si es muy grande (>5MB)
+      const fileToUpload = img.size > 5 * 1024 * 1024 ? await compressImage(img) : img;
+      
+      const formData = new FormData();
+      formData.append("file", fileToUpload);
+      const response = await axios.post(`/posts/${postId}/img`, formData);
+      if (!response.data.url) throw new Error("Error to upload this image");
 
-    return response.data.url;
+      return response.data.url;
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      throw error;
+    }
   };
 
   /**
@@ -59,6 +109,7 @@ export function usePosts() {
         index++;
       } catch (err) {
         console.warn("Error procesando imagen blob:", err);
+        throw new Error("Error al subir la imagen");
       }
     }
 
@@ -262,25 +313,27 @@ export function usePosts() {
       loading.open("Subiendo imagenes...");
 
       const formData = new FormData();
+
+      // Agregar campos de forma explícita como en covers
+      formData.append("title", post.title);
+      formData.append("contentHtml", post.contentHtml);
+      formData.append("category", post.category || "");
+      formData.append("state", post.state || "Borrador");
+      formData.append("author", post.author || "");
+      formData.append("tags", post.tags || "");
+      formData.append("fixedHome", String(post.fixedHome || false));
+      formData.append("fixedCategory", String(post.fixedCategory || false));
+      formData.append("slug", post.slug || "");
+
+      // Agregar archivo si existe
       if (file) formData.append("file", file);
 
-      for (const key in post) {
-        const value = post[key as keyof Post];
-        if (
-          value instanceof Blob ||
-          typeof value === "string" ||
-          typeof value === "number" ||
-          typeof value === "boolean"
-        ) {
-          formData.append(
-            key,
-            key === "contentHtml" ? (value as string) : String(value)
-          );
-        }
-      }
-
       // Create post
-      const response = await axios.post("/posts", formData);
+      const response = await axios.post("/posts", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
       const newPost = response.data as Post;
       if (!newPost) new Error("Error to create the post");
 
@@ -292,8 +345,6 @@ export function usePosts() {
           loading.setMessage(`Subiendo imágenes: ${curr}/${total}`)
       );
       const postWidthImg: Post = { ...response.data, contentHtml: updatedText };
-
-      console.log("Antes del put", postWidthImg, updatedText);
 
       // Upload text widht img urls
       await updatePost(postWidthImg);
@@ -313,7 +364,7 @@ export function usePosts() {
     try {
       loading.open("Subiendo imágenes...");
 
-      // Upload images
+      // Upload images del contenido
       const originalImages = extractImageSources(post.contentHtml);
       const updatedText = await replaceBlobImages(
         post.contentHtml,
@@ -330,28 +381,36 @@ export function usePosts() {
       );
       await Promise.all(deletedImages.map(deleteImageFromServer));
 
-      // Update post
-      const formData = new FormData();
-      if (file) formData.append("file", file);
-
-      for (const key in post) {
-        const value = post[key as keyof Post];
-
-        if (key === "contentHtml") {
-          formData.append("contentHtml", updatedText);
-        } else if (
-          value instanceof Blob ||
-          typeof value === "string" ||
-          typeof value === "number" ||
-          typeof value === "boolean"
-        ) {
-          formData.append(key, String(value));
+      // Subir portada si existe usando uploadImage
+      let coverUrl = post.coverUrl || "";
+      if (file) {
+        loading.setMessage("Subiendo portada...");
+        const uploadedUrl = await uploadImage(file, post.id!);
+        if (uploadedUrl) {
+          coverUrl = uploadedUrl;
         }
       }
 
-      console.log("Antes del put", updatedText);
+      // Preparar datos para actualizar (sin FormData)
+      const updateData = {
+        title: post.title,
+        contentHtml: updatedText,
+        category: post.category || "",
+        state: post.state || "Borrador",
+        author: post.author || "",
+        tags: post.tags || "",
+        fixedHome: post.fixedHome || false,
+        fixedCategory: post.fixedCategory || false,
+        slug: post.slug || "",
+        coverUrl: coverUrl,
+      };
 
-      const response = await axios.put(`/posts/${post.id}`, formData);
+      // Enviar datos como JSON normal
+      const response = await axios.put(`/posts/${post.id}`, updateData, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
       posts.update(response.data);
 
       Swal.fire(

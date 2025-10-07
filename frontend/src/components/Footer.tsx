@@ -1,7 +1,7 @@
 import { Facebook, Instagram, Twitter } from "lucide-react";
 
 import logoFaustinee from "@/assets/logo-horizontral-transparent.png";
-import logoPuma from "@/assets/empresas/Puma-Logo-768x432.png";
+// import logoPuma from "@/assets/empresas/Puma-Logo-768x432.png";
 import logoLoreal from "@/assets/empresas/Loreal-Paris.jpg";
 import logoMoet from "@/assets/empresas/moet-logo.jpg";
 import logoCartier from "@/assets/empresas/logo-cartier.jpeg";
@@ -17,14 +17,15 @@ function Footer() {
           <div className="flex justify-center p-4 w-max m-auto">
             <div className="flex gap-6 w-max">
               {/* Logos de partners - reemplaza con tus imágenes */}
-              <a
+              {/*               <a
                 className="flex items-center justify-center h-[80px] cursor-pointer"
                 href="https://ar.puma.com/"
                 target="_blank"
               >
                 <img className="h-full" src={logoPuma} alt="logo-Puma" />
-              </a>
+              </a> */}
               <a
+                rel="noopener noreferrer"
                 className="flex items-center justify-center h-[80px] cursor-pointer"
                 href="https://www.moet.com/"
                 target="_blank"
@@ -32,6 +33,7 @@ function Footer() {
                 <img className="h-full" src={logoMoet} alt="logo-Moet" />
               </a>
               <a
+                rel="noopener noreferrer"
                 className="flex items-center justify-center h-[80px] cursor-pointer"
                 href="https://cartier.com/"
                 target="_blank"
@@ -39,6 +41,7 @@ function Footer() {
                 <img className="h-full" src={logoCartier} alt="logo-Cartier" />
               </a>
               <a
+                rel="noopener noreferrer"
                 className="flex items-center justify-center h-[80px] cursor-pointer"
                 href="https://www.lorealparis.com.ar/"
                 target="_blank"
@@ -50,7 +53,7 @@ function Footer() {
         </div>
       </div>
 
-      <div className="border-t border-gray-200 bg-white">
+      <div className="border-t border-gray-200 bg-black text-white">
         <div className="flex flex-col md:flex-row items-center justify-between mx-auto gap-10 md:px-8 py-8 px-4 max-w-6xl">
           <div className="flex flex-col gap-10 h-full m-auto p-4">
             {/* Logo de la revista */}
@@ -70,7 +73,7 @@ function Footer() {
               >
                 <Facebook
                   strokeWidth={1}
-                  className="text-gray-400 hover:text-primary transition duration-300"
+                  className="text-gray-200 hover:text-primary transition duration-300"
                 />
               </a>
               <a
@@ -81,7 +84,7 @@ function Footer() {
               >
                 <Instagram
                   strokeWidth={1}
-                  className="text-gray-400 hover:text-primary transition duration-300"
+                  className="text-gray-200 hover:text-primary transition duration-300"
                 />
               </a>
               <a
@@ -92,17 +95,17 @@ function Footer() {
               >
                 <Twitter
                   strokeWidth={1}
-                  className="text-gray-400 hover:text-primary transition duration-300"
+                  className="text-gray-200 hover:text-primary transition duration-300"
                 />
               </a>
             </div>
           </div>
 
           <div className="px-10">
-            <h3 className="text-gray-800 text-xl font-title font-bold mb-4">
+            <h3 className="text-gray-200 text-xl font-title font-bold mb-4">
               CONTACTO
             </h3>
-            <ul className="text-gray-600 text-sm font-text">
+            <ul className="text-gray-200 text-sm font-text">
               <li>
                 <a
                   href="mailto:edition@faustinee.com"
@@ -131,12 +134,12 @@ function Footer() {
           </div>
 
           <div className="px-10">
-            <h3 className="text-gray-800 text-xl font-title font-bold mb-4">
+            <h3 className="text-gray-200 text-xl font-title font-bold mb-4">
               EQUIPO
             </h3>
             <div className="m-auto md:m-0 max-w-[250px] font-text text-xs">
-              <p className="text-gray-600 mb-2">Edición General: Mónica Brun</p>
-              <p className="text-gray-600">
+              <p className="text-gray-200 mb-2">Edición General: Mónica Brun</p>
+              <p className="text-gray-200">
                 Redactores, Productores y Periodistas: Equipo Revista Faustinee
               </p>
             </div>

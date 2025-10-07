@@ -9,6 +9,14 @@ use Slim\Psr7\Response;
 
 class PostsController
 {
+  private function getBaseUrl()
+  {
+    // Cargar configuración de la aplicación (que ya maneja las variables de entorno)
+    $config = require __DIR__ . '/../../../config/app.php';
+    $baseUrl = rtrim($config['app_url'], '/');
+    return $baseUrl;
+  }
+
   private function generateSlug($title)
   {
     // Convertir a minúsculas y reemplazar caracteres especiales
@@ -47,6 +55,29 @@ class PostsController
     }
   }
 
+  private function handleCoverUpload($uploadedFile)
+  {
+    try {
+      $folder = __DIR__ . '/../../../public/uploads/covers';
+      if (!is_dir($folder)) {
+        mkdir($folder, 0755, true);
+      }
+
+      $filename = uniqid() . '.' . pathinfo($uploadedFile->getClientFilename(), PATHINFO_EXTENSION);
+      $filePath = $folder . '/' . $filename;
+
+      // Usar moveTo() de Slim como en covers
+      $uploadedFile->moveTo($filePath);
+
+      // Retornar URL completa con base URL
+      $baseUrl = $this->getBaseUrl();
+      return $baseUrl . '/api/uploads/posts/' . $filename;
+    } catch (\Exception $e) {
+      error_log('Error uploading cover: ' . $e->getMessage());
+      return '';
+    }
+  }
+
   public function index(Request $request, Response $response, array $args): Response
   {
     try {
@@ -77,8 +108,6 @@ class PostsController
           'date' => $post->getDate(),
           'fixedHome' => (bool)$post->getFixedHome(),
           'fixedCategory' => (bool)$post->getFixedCategory(),
-          'created_at' => $post->getCreatedAt(),
-          'updated_at' => $post->getUpdatedAt()
         ];
       }, $result['items']);
       $response->getBody()->write(json_encode($result));
@@ -118,8 +147,6 @@ class PostsController
         'date' => $post->getDate(),
         'fixedHome' => (bool)$post->getFixedHome(),
         'fixedCategory' => (bool)$post->getFixedCategory(),
-        'created_at' => $post->getCreatedAt(),
-        'updated_at' => $post->getUpdatedAt()
       ];
       $response->getBody()->write(json_encode($data));
       return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
@@ -133,31 +160,52 @@ class PostsController
 
   public function store(Request $request, Response $response, array $args): Response
   {
+    // Usar la misma lógica que covers - getParsedBody() y getUploadedFiles()
     $data = $request->getParsedBody();
-    
-    // Si no hay datos en getParsedBody(), intentar obtener de $_POST (FormData)
-    if (empty($data)) {
-      $data = $_POST;
-    }
+    $uploadedFiles = $request->getUploadedFiles();
 
+
+    // Validar campos requeridos
     $title = $data['title'] ?? '';
     $contentHtml = $data['contentHtml'] ?? '';
+    $category = $data['category'] ?? '';
+    $state = $data['state'] ?? 'Borrador';
+    $author = $data['author'] ?? '';
+    $tags = $data['tags'] ?? '';
+
     if (empty($title) || empty($contentHtml)) {
-      error_log('Validación fallida - Title: ' . $title . ', ContentHtml: ' . (empty($contentHtml) ? 'EMPTY' : 'PRESENT'));
       $response->getBody()->write(json_encode(['error' => 'Title and contentHtml are required']));
       return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
     }
-    try {
-      // Convertir valores booleanos de string a int
-      $data['fixedHome'] = $data['fixedHome'] === 'true' || $data['fixedHome'] === true ? 1 : 0;
-      $data['fixedCategory'] = $data['fixedCategory'] === 'true' || $data['fixedCategory'] === true ? 1 : 0;
 
-      // Generar slug automáticamente si está vacío
-      if (empty($data['slug'])) {
-        $data['slug'] = $this->generateSlug($data['title']);
+    try {
+      // Procesar archivo de cover si existe - usando la lógica de Slim como en covers
+      $coverUrl = '';
+      if (isset($uploadedFiles['file']) && $uploadedFiles['file']->getError() === UPLOAD_ERR_OK) {
+        $coverUrl = $this->handleCoverUpload($uploadedFiles['file']);
       }
 
-      $post = Posts::create($data);
+      // Preparar datos para crear el post
+      $postData = [
+        'title' => $title,
+        'contentHtml' => $contentHtml,
+        'category' => $category,
+        'state' => $state,
+        'author' => $author,
+        'tags' => $tags,
+        'coverUrl' => $coverUrl,
+        'fixedHome' => isset($data['fixedHome']) && ($data['fixedHome'] === 'true' || $data['fixedHome'] === true) ? 1 : 0,
+        'fixedCategory' => isset($data['fixedCategory']) && ($data['fixedCategory'] === 'true' || $data['fixedCategory'] === true) ? 1 : 0,
+        'slug' => $data['slug'] ?? ''
+      ];
+
+      // Generar slug automáticamente si está vacío
+      if (empty($postData['slug'])) {
+        $postData['slug'] = $this->generateSlug($postData['title']);
+      }
+
+
+      $post = Posts::create($postData);
       $result = [
         'id' => $post->getId(),
         'title' => $post->getTitle(),
@@ -172,15 +220,13 @@ class PostsController
         'date' => $post->getDate(),
         'fixedHome' => (bool)$post->getFixedHome(),
         'fixedCategory' => (bool)$post->getFixedCategory(),
-        'created_at' => $post->getCreatedAt(),
-        'updated_at' => $post->getUpdatedAt()
       ];
       $response->getBody()->write(json_encode($result));
       return $response->withHeader('Content-Type', 'application/json')->withStatus(201);
     } catch (\Exception $e) {
       error_log('Error creating post: ' . $e->getMessage());
       error_log('Stack trace: ' . $e->getTraceAsString());
-      $response->getBody()->write(json_encode(['error' => 'Failed to create post']));
+      $response->getBody()->write(json_encode(['error' => 'Failed to create post: ' . $e->getMessage()]));
       return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
     }
   }
@@ -192,41 +238,70 @@ class PostsController
       $response->getBody()->write(json_encode(['error' => 'ID is required']));
       return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
     }
+
+    // Obtener datos del JSON body
     $data = $request->getParsedBody();
-    
-    // Si no hay datos en getParsedBody(), usar $_POST (FormData)
-    if (empty($data)) {
-      $data = $_POST;
-    }
-    
+
+
     $title = $data['title'] ?? '';
     $contentHtml = $data['contentHtml'] ?? '';
+
     if (empty($title) || empty($contentHtml)) {
-      error_log('Validación fallida - Title vacío: ' . (empty($title) ? 'SÍ' : 'NO') . ', ContentHtml vacío: ' . (empty($contentHtml) ? 'SÍ' : 'NO'));
       $response->getBody()->write(json_encode(['error' => 'Title and contentHtml are required']));
       return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
     }
+
     try {
-      // Convertir valores booleanos de string a int
-      $data['fixedHome'] = $data['fixedHome'] === 'true' || $data['fixedHome'] === true ? 1 : 0;
-      $data['fixedCategory'] = $data['fixedCategory'] === 'true' || $data['fixedCategory'] === true ? 1 : 0;
+      // Preparar datos para actualizar el post (ya incluye coverUrl del frontend)
+      $updateData = [
+        'title' => $title,
+        'contentHtml' => $contentHtml,
+        'category' => $data['category'] ?? '',
+        'state' => $data['state'] ?? 'Borrador',
+        'author' => $data['author'] ?? '',
+        'tags' => $data['tags'] ?? '',
+        'fixedHome' => $data['fixedHome'] === true || $data['fixedHome'] === 'true' ? 1 : 0,
+        'fixedCategory' => $data['fixedCategory'] === true || $data['fixedCategory'] === 'true' ? 1 : 0,
+        'slug' => $data['slug'] ?? '',
+        'coverUrl' => $data['coverUrl'] ?? ''
+      ];
 
       // Generar slug automáticamente si está vacío
-      if (empty($data['slug'])) {
-        $data['slug'] = $this->generateSlug($data['title']);
+      if (empty($updateData['slug'])) {
+        $updateData['slug'] = $this->generateSlug($updateData['title']);
       }
 
-      $success = Posts::update($id, $data);
+
+      $success = Posts::update($id, $updateData);
       if (!$success) {
         $response->getBody()->write(json_encode(['error' => 'Failed to update post']));
         return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
       }
-      $response->getBody()->write(json_encode(['message' => 'Post updated successfully']));
+
+      // Obtener el post actualizado para devolverlo
+      $updatedPost = Posts::findById($id);
+      $result = [
+        'id' => $updatedPost->getId(),
+        'title' => $updatedPost->getTitle(),
+        'slug' => $updatedPost->getSlug(),
+        'category' => $updatedPost->getCategory(),
+        'contentHtml' => $updatedPost->getContentHtml(),
+        'coverUrl' => $updatedPost->getCoverUrl(),
+        'tags' => $updatedPost->getTags(),
+        'state' => $updatedPost->getState(),
+        'reads' => $updatedPost->getReads(),
+        'author' => $updatedPost->getAuthor(),
+        'date' => $updatedPost->getDate(),
+        'fixedHome' => (bool)$updatedPost->getFixedHome(),
+        'fixedCategory' => (bool)$updatedPost->getFixedCategory(),
+      ];
+
+      $response->getBody()->write(json_encode($result));
       return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
     } catch (\Exception $e) {
       error_log('Error updating post: ' . $e->getMessage());
       error_log('Stack trace: ' . $e->getTraceAsString());
-      $response->getBody()->write(json_encode(['error' => 'Failed to update post']));
+      $response->getBody()->write(json_encode(['error' => 'Failed to update post: ' . $e->getMessage()]));
       return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
     }
   }
@@ -256,6 +331,13 @@ class PostsController
 
   public function uploadImage(Request $request, Response $response, array $args): Response
   {
+    // Get base URL
+    $baseUrl = $this->getBaseUrl();
+    if (empty($baseUrl)) {
+      $response->getBody()->write(json_encode(['error' => 'Base URL is required']));
+      return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
+    }
+
     $id = $args['id'] ?? null;
     if (!$id) {
       $response->getBody()->write(json_encode(['error' => 'ID is required']));
@@ -267,28 +349,43 @@ class PostsController
       return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
     }
     $file = $uploadedFiles['file'];
+
+    // Verificar errores de upload con mensajes específicos
     if ($file->getError() !== UPLOAD_ERR_OK) {
-      $response->getBody()->write(json_encode(['error' => 'File upload error']));
+      $uploadErrors = [
+        UPLOAD_ERR_INI_SIZE => 'El archivo excede el tamaño máximo permitido por PHP (upload_max_filesize)',
+        UPLOAD_ERR_FORM_SIZE => 'El archivo excede el tamaño máximo permitido por el formulario (post_max_size)',
+        UPLOAD_ERR_PARTIAL => 'El archivo fue subido parcialmente',
+        UPLOAD_ERR_NO_FILE => 'No se subió ningún archivo',
+        UPLOAD_ERR_NO_TMP_DIR => 'Falta el directorio temporal',
+        UPLOAD_ERR_CANT_WRITE => 'No se pudo escribir el archivo al disco',
+        UPLOAD_ERR_EXTENSION => 'Una extensión de PHP detuvo la subida del archivo'
+      ];
+      $errorMessage = $uploadErrors[$file->getError()] ?? 'Error desconocido al subir el archivo';
+      error_log('Error de upload: ' . $errorMessage . ' (Error code: ' . $file->getError() . ')');
+      $response->getBody()->write(json_encode(['error' => $errorMessage]));
+      return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
+    }
+
+
+    // Verificar tamaño del archivo (50MB máximo)
+    $maxSize = 50 * 1024 * 1024; // 50MB en bytes
+    if ($file->getSize() > $maxSize) {
+      $response->getBody()->write(json_encode(['error' => 'El archivo es demasiado grande. Tamaño máximo permitido: 50MB']));
       return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
     }
     try {
       $folder = __DIR__ . '/../../../public/uploads/posts/' . $id;
-      error_log('Upload folder: ' . $folder);
-      error_log('File error: ' . $file->getError());
-      error_log('File size: ' . $file->getSize());
-      error_log('File name: ' . $file->getClientFilename());
 
       if (!is_dir($folder)) {
         mkdir($folder, 0755, true);
-        error_log('Created directory: ' . $folder);
       }
       $filename = uniqid() . '.' . pathinfo($file->getClientFilename(), PATHINFO_EXTENSION);
       $filePath = $folder . '/' . $filename;
-      error_log('Moving file to: ' . $filePath);
 
       $file->moveTo($filePath);
-      $url = '/uploads/posts/' . $id . '/' . $filename;
-      error_log('Generated URL: ' . $url);
+
+      $url = $baseUrl . '/api/uploads/posts/' . $id . '/' . $filename;
 
       $response->getBody()->write(json_encode(['url' => $url]));
       return $response->withHeader('Content-Type', 'application/json')->withStatus(200);

@@ -8,6 +8,10 @@ dist
 lib
 build
 
+# STATIC FILES
+api/public/uploads
+uploads
+
 # LOGS
 *.log
 .vite

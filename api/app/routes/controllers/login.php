@@ -19,10 +19,6 @@ class LoginController {
                 $data = $request->getParsedBody();
             }
             
-            // Debug: Log de los datos recibidos
-            error_log('Datos recibidos en login: ' . print_r($data, true));
-            error_log('Raw body: ' . $rawBody);
-            
             $email = $data['email'] ?? '';
             $password = $data['password'] ?? '';
 
@@ -39,10 +35,7 @@ class LoginController {
                 return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
             }
 
-            // Buscar el usuario por email
-            error_log('Buscando usuario con email: ' . $email);
             $user = Users::findByEmail($email);
-            error_log('Resultado de búsqueda: ' . ($user ? 'Usuario encontrado' : 'Usuario no encontrado'));
             
             if (!$user) {
                 $response->getBody()->write(json_encode([

@@ -18,13 +18,13 @@ export default function ProtectedRoute({
   // Validar con servidor cuando se monta el componente
   useEffect(() => {
     validateWithServer();
-  }, [validateWithServer]);
+  }, []);
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
       navigate(redirectTo);
     }
-  }, [isAuthenticated, isLoading, redirectTo, navigate]);
+  }, [isAuthenticated, isLoading, redirectTo]);
 
   if (isLoading) {
     return <Loading label="Verificando autenticación..." />;

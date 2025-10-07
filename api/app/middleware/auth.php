@@ -13,9 +13,6 @@ class AuthMiddleware {
             // Obtener el token del header Authorization
             $authHeader = $request->getHeaderLine('Authorization');
             
-            // Debug: Log del header recibido
-            error_log('Authorization header recibido: ' . $authHeader);
-            
             if (empty($authHeader)) {
                 $response = new Response();
                 $response->getBody()->write(json_encode([
@@ -66,9 +63,6 @@ class AuthMiddleware {
             // Agregar la información del usuario al request
             $request = $request->withAttribute('user', $decoded);
             
-            // Log de autenticación exitosa
-            error_log('Usuario autenticado: ' . $decoded['email']);
-
             return $handler->handle($request);
 
         } catch (\Exception $e) {

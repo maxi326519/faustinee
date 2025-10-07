@@ -19,10 +19,8 @@ class Posts
   private $date;
   private $fixedHome;
   private $fixedCategory;
-  private $created_at;
-  private $updated_at;
 
-  public function __construct($id = null, $title = null, $slug = null, $category = null, $contentHtml = null, $coverUrl = null, $tags = null, $state = null, $reads = null, $author = null, $date = null, $fixedHome = null, $fixedCategory = null, $created_at = null, $updated_at = null)
+  public function __construct($id = null, $title = null, $slug = null, $category = null, $contentHtml = null, $coverUrl = null, $tags = null, $state = null, $reads = null, $author = null, $date = null, $fixedHome = null, $fixedCategory = null)
   {
     $this->id = $id;
     $this->title = $title;
@@ -37,8 +35,6 @@ class Posts
     $this->date = $date;
     $this->fixedHome = $fixedHome;
     $this->fixedCategory = $fixedCategory;
-    $this->created_at = $created_at ?: date('Y-m-d H:i:s');
-    $this->updated_at = $updated_at ?: date('Y-m-d H:i:s');
   }
 
   public function getId()
@@ -106,20 +102,9 @@ class Posts
     return $this->fixedCategory;
   }
 
-  public function getCreatedAt()
-  {
-    return $this->created_at;
-  }
-
-  public function getUpdatedAt()
-  {
-    return $this->updated_at;
-  }
-
   public function setTitle($title)
   {
     $this->title = $title;
-    $this->updated_at = date('Y-m-d H:i:s');
   }
 
   public function setSlug($slug)
@@ -135,7 +120,6 @@ class Posts
   public function setContentHtml($contentHtml)
   {
     $this->contentHtml = $contentHtml;
-    $this->updated_at = date('Y-m-d H:i:s');
   }
 
   public function setCoverUrl($coverUrl)
@@ -185,7 +169,7 @@ class Posts
     $results = $stmt->fetchAll();
     $posts = [];
     foreach ($results as $row) {
-      $posts[] = new self($row['id'], $row['title'], $row['slug'] ?? null, $row['category'] ?? null, $row['contentHtml'] ?? null, $row['coverUrl'] ?? null, $row['tags'] ?? null, $row['state'] ?? 'Borrador', $row['reads'] ?? 0, $row['author'] ?? null, $row['date'] ?? null, $row['fixedHome'] ?? null, $row['fixedCategory'] ?? null, $row['created_at'] ?? null, $row['updated_at'] ?? null);
+      $posts[] = new self($row['id'], $row['title'], $row['slug'] ?? null, $row['category'] ?? null, $row['contentHtml'] ?? null, $row['coverUrl'] ?? null, $row['tags'] ?? null, $row['state'] ?? 'Borrador', $row['reads'] ?? 0, $row['author'] ?? null, $row['date'] ?? null, $row['fixedHome'] ?? null, $row['fixedCategory'] ?? null);
     }
     return $posts;
   }
@@ -257,7 +241,7 @@ class Posts
 
     $posts = [];
     foreach ($results as $row) {
-      $posts[] = new self($row['id'], $row['title'], $row['slug'] ?? null, $row['category'] ?? null, $row['contentHtml'] ?? null, $row['coverUrl'] ?? null, $row['tags'] ?? null, $row['state'] ?? 'Borrador', $row['reads'] ?? 0, $row['author'] ?? null, $row['date'] ?? null, $row['fixedHome'] ?? null, $row['fixedCategory'] ?? null, $row['created_at'] ?? null, $row['updated_at'] ?? null);
+      $posts[] = new self($row['id'], $row['title'], $row['slug'] ?? null, $row['category'] ?? null, $row['contentHtml'] ?? null, $row['coverUrl'] ?? null, $row['tags'] ?? null, $row['state'] ?? 'Borrador', $row['reads'] ?? 0, $row['author'] ?? null, $row['date'] ?? null, $row['fixedHome'] ?? null, $row['fixedCategory'] ?? null);
     }
 
     return [
@@ -277,7 +261,7 @@ class Posts
     $stmt->execute([$id]);
     $row = $stmt->fetch();
     if ($row) {
-      return new self($row['id'], $row['title'], $row['slug'], $row['category'], $row['contentHtml'], $row['coverUrl'], $row['tags'], $row['state'], $row['reads'], $row['author'], $row['date'], $row['fixedHome'], $row['fixedCategory'], $row['created_at'], $row['updated_at']);
+      return new self($row['id'], $row['title'], $row['slug'], $row['category'], $row['contentHtml'], $row['coverUrl'], $row['tags'], $row['state'], $row['reads'], $row['author'], $row['date'], $row['fixedHome'], $row['fixedCategory']);
     }
     return null;
   }
@@ -293,7 +277,7 @@ class Posts
       $stmt = $pdo->prepare("UPDATE Posts SET `reads` = `reads` + 1 WHERE id = ?");
       $stmt->execute([$row['id']]);
       $row['reads'] += 1;
-      return new self($row['id'], $row['title'], $row['slug'], $row['category'], $row['contentHtml'], $row['coverUrl'], $row['tags'], $row['state'], $row['reads'], $row['author'], $row['date'], $row['fixedHome'], $row['fixedCategory'], $row['created_at'], $row['updated_at']);
+      return new self($row['id'], $row['title'], $row['slug'], $row['category'], $row['contentHtml'], $row['coverUrl'], $row['tags'], $row['state'], $row['reads'], $row['author'], $row['date'], $row['fixedHome'], $row['fixedCategory']);
     }
     return null;
   }
@@ -305,36 +289,36 @@ class Posts
     $now = date('Y-m-d H:i:s');
     $stmt = $pdo->prepare("INSERT INTO Posts (id, title, slug, category, contentHtml, coverUrl, tags, state, `reads`, author, date, fixedHome, fixedCategory) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
     $stmt->execute([
-        $id, 
-        $data['title'], 
-        $data['slug'], 
-        $data['category'] ?? '', 
-        $data['contentHtml'], 
-        $data['coverUrl'] ?? '', 
-        $data['tags'] ?? '', 
-        $data['state'] ?? 'Borrador', 
-        $data['reads'] ?? 0, 
-        $data['author'] ?? '', 
-        $data['date'] ?? date('Y-m-d'), 
-        $data['fixedHome'] ?? 0, 
-        $data['fixedCategory'] ?? 0
+      $id,
+      $data['title'],
+      $data['slug'],
+      $data['category'] ?? '',
+      $data['contentHtml'],
+      $data['coverUrl'] ?? '',
+      $data['tags'] ?? '',
+      $data['state'] ?? 'Borrador',
+      $data['reads'] ?? 0,
+      $data['author'] ?? '',
+      $data['date'] ?? date('Y-m-d'),
+      $data['fixedHome'] ?? 0,
+      $data['fixedCategory'] ?? 0
     ]);
     return new self(
-        $id, 
-        $data['title'], 
-        $data['slug'], 
-        $data['category'] ?? '', 
-        $data['contentHtml'], 
-        $data['coverUrl'] ?? '', 
-        $data['tags'] ?? '', 
-        $data['state'] ?? 'Borrador', 
-        $data['reads'] ?? 0, 
-        $data['author'] ?? '', 
-        $data['date'] ?? date('Y-m-d'), 
-        $data['fixedHome'] ?? 0, 
-        $data['fixedCategory'] ?? 0, 
-        $now, 
-        $now
+      $id,
+      $data['title'],
+      $data['slug'],
+      $data['category'] ?? '',
+      $data['contentHtml'],
+      $data['coverUrl'] ?? '',
+      $data['tags'] ?? '',
+      $data['state'] ?? 'Borrador',
+      $data['reads'] ?? 0,
+      $data['author'] ?? '',
+      $data['date'] ?? date('Y-m-d'),
+      $data['fixedHome'] ?? 0,
+      $data['fixedCategory'] ?? 0,
+      $now,
+      $now
     );
   }
 
@@ -344,19 +328,19 @@ class Posts
     $now = date('Y-m-d H:i:s');
     $stmt = $pdo->prepare("UPDATE Posts SET title = ?, slug = ?, category = ?, contentHtml = ?, coverUrl = ?, tags = ?, state = ?, `reads` = ?, author = ?, date = ?, fixedHome = ?, fixedCategory = ? WHERE id = ?");
     return $stmt->execute([
-        $data['title'], 
-        $data['slug'], 
-        $data['category'] ?? '', 
-        $data['contentHtml'], 
-        $data['coverUrl'] ?? '', 
-        $data['tags'] ?? '', 
-        $data['state'] ?? 'Borrador', 
-        $data['reads'] ?? 0, 
-        $data['author'] ?? '', 
-        $data['date'] ?? date('Y-m-d'), 
-        $data['fixedHome'] ?? 0, 
-        $data['fixedCategory'] ?? 0, 
-        $id
+      $data['title'],
+      $data['slug'],
+      $data['category'] ?? '',
+      $data['contentHtml'],
+      $data['coverUrl'] ?? '',
+      $data['tags'] ?? '',
+      $data['state'] ?? 'Borrador',
+      $data['reads'] ?? 0,
+      $data['author'] ?? '',
+      $data['date'] ?? date('Y-m-d'),
+      $data['fixedHome'] ?? 0,
+      $data['fixedCategory'] ?? 0,
+      $id
     ]);
   }
 

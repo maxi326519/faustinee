@@ -20,7 +20,6 @@ interface PasswordModalProps {
 export function PasswordModal({ isOpen, onClose }: PasswordModalProps) {
   const { changePassword } = useUsers();
   const { data: user } = useUserStore();
-  // console.log(user);
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     oldPassword: "",

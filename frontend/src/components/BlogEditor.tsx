@@ -41,10 +41,6 @@ const BlogEditor: React.FC<Props> = ({ data, onSave, onClose }) => {
   const [tags, setTags] = useState<string[]>([]);
 
   useEffect(() => {
-    console.log(post.contentHtml);
-  }, [post, type]);
-
-  useEffect(() => {
     if (data) {
       setPost({ ...data, contentHtml: cleanEscapedHtml(data.contentHtml) });
       setCoverUrl(data.coverUrl);
@@ -83,7 +79,6 @@ const BlogEditor: React.FC<Props> = ({ data, onSave, onClose }) => {
       post.author &&
       (data?.coverUrl || (!data && cover))
     ) {
-      console.log("Publicando");
       onSave(
         { ...post, tags: tags.join(" "), state: PostState.PUBLICADO },
         cover!
@@ -91,7 +86,6 @@ const BlogEditor: React.FC<Props> = ({ data, onSave, onClose }) => {
     }
 
     if (!publish) {
-      console.log("Guardando");
       onSave({ ...post, tags: tags.join(" ") }, cover!);
     }
   };

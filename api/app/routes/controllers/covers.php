@@ -11,9 +11,10 @@ class CoversController
 {
   private function getBaseUrl()
   {
-    // Cargar configuración de la aplicación
+    // Cargar configuración de la aplicación (que ya maneja las variables de entorno)
     $config = require __DIR__ . '/../../../config/app.php';
-    return rtrim($config['app_url'], '/');
+    $baseUrl = rtrim($config['app_url'], '/');
+    return $baseUrl;
   }
 
   public function index(Request $request, Response $response, array $args): Response
@@ -23,9 +24,9 @@ class CoversController
       $data = array_map(function ($cover) {
         $baseUrl = $this->getBaseUrl();
         $imageUrl = $cover->getImageUrl();
-        // Si la URL no comienza con http, agregar la base URL
+        // Si la URL no comienza con http, agregar la base URL con /api
         if (!str_starts_with($imageUrl, 'http')) {
-          $imageUrl = $baseUrl . $imageUrl;
+          $imageUrl = $baseUrl . '/api' . $imageUrl;
         }
 
         return [
@@ -65,9 +66,9 @@ class CoversController
       if ($pinnedCover) {
         $baseUrl = $this->getBaseUrl();
         $imageUrl = $pinnedCover->getImageUrl();
-        // Si la URL no comienza con http, agregar la base URL
+        // Si la URL no comienza con http, agregar la base URL con /api
         if (!str_starts_with($imageUrl, 'http')) {
-          $imageUrl = $baseUrl . $imageUrl;
+          $imageUrl = $baseUrl . '/api' . $imageUrl;
         }
 
         $data = [
@@ -97,9 +98,6 @@ class CoversController
     $data = $request->getParsedBody();
     $uploadedFiles = $request->getUploadedFiles();
 
-    // Debug: Log de los datos recibidos
-    error_log('Datos recibidos en store: ' . print_r($data, true));
-    error_log('Archivos recibidos: ' . print_r($uploadedFiles, true));
 
     if (empty($data['title'])) {
       $response->getBody()->write(json_encode(['error' => 'Title is required']));
@@ -107,9 +105,6 @@ class CoversController
     }
     if (isset($uploadedFiles['image'])) {
       $file = $uploadedFiles['image'];
-      error_log('Error del archivo: ' . $file->getError());
-      error_log('Tamaño del archivo: ' . $file->getSize());
-      error_log('Nombre del archivo: ' . $file->getClientFilename());
 
       if ($file->getError() === UPLOAD_ERR_OK) {
         $filename = uniqid() . '.' . pathinfo($file->getClientFilename(), PATHINFO_EXTENSION);
@@ -118,7 +113,10 @@ class CoversController
           mkdir($uploadDir, 0755, true);
         }
         $file->moveTo($uploadDir . $filename);
-        $data['imageUrl'] = '/uploads/covers/' . $filename;
+
+        // Generar URL completa con base URL
+        $baseUrl = $this->getBaseUrl();
+        $data['imageUrl'] = $baseUrl . '/api/uploads/covers/' . $filename;
       } else {
         // Manejar errores de upload
         $uploadErrors = [
@@ -131,7 +129,6 @@ class CoversController
           UPLOAD_ERR_EXTENSION => 'Una extensión de PHP detuvo la subida del archivo'
         ];
         $errorMessage = $uploadErrors[$file->getError()] ?? 'Error desconocido al subir el archivo';
-        error_log('Error de upload: ' . $errorMessage);
         $response->getBody()->write(json_encode(['error' => $errorMessage]));
         return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
       }

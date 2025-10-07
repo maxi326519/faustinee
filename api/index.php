@@ -1,9 +1,12 @@
 <?php
-// index.php - Backend súper simple
-
-// Configurar para mostrar errores
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
+
+// Intentar configurar límites
+ini_set('upload_max_filesize', '40M');
+ini_set('post_max_size', '50M');
+ini_set('max_execution_time', 300);
+ini_set('max_input_time', 300);
 
 // Servir archivos estáticos antes de procesar rutas de API
 $requestUri = $_SERVER['REQUEST_URI'];
@@ -11,8 +14,11 @@ $parsedUrl = parse_url($requestUri);
 $path = $parsedUrl['path'];
 
 // Si es una petición a archivos estáticos (uploads), servirlos directamente
-if (strpos($path, '/uploads/') === 0) {
-  $filePath = __DIR__ . '/public' . $path;
+if (strpos($path, '/api/uploads/') === 0) {
+  // Remover /api de la ruta para obtener la ruta relativa
+  $relativePath = substr($path, 4); // Remover '/api'
+  $filePath = __DIR__ . '/public' . $relativePath;
+  
   if (file_exists($filePath) && is_file($filePath)) {
     // Determinar el tipo MIME basado en la extensión del archivo
     $extension = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
@@ -33,11 +39,12 @@ if (strpos($path, '/uploads/') === 0) {
 
     header('Content-Type: ' . $mimeType);
     header('Content-Length: ' . filesize($filePath));
+    header('Cache-Control: public, max-age=31536000');
     readfile($filePath);
     exit;
   } else {
     http_response_code(404);
-    echo 'File not found: ' . $filePath;
+    echo 'File not found: ' . $relativePath;
     exit;
   }
 }
@@ -79,72 +86,11 @@ if (isset($_SERVER['HTTP_HOST']) && strpos($_SERVER['HTTP_HOST'], 'localhost') =
 // Configurar el parser de JSON y FormData
 $app->addBodyParsingMiddleware();
 
-// Middleware para logging de rutas y parsing de FormData
+// Middleware para logging de rutas
 $app->add(function (Request $request, \Psr\Http\Server\RequestHandlerInterface $handler) {
   $method = $request->getMethod();
   $uri = $request->getUri()->getPath();
-  error_log("🌐 Accediendo a: $method $uri");
-  
   $contentType = $request->getHeaderLine('Content-Type');
-  
-  // Parsing manual de FormData para PUT/PATCH
-  if (strpos($contentType, 'multipart/form-data') !== false && empty($_POST)) {
-    error_log("📝 Parseando FormData manualmente para $method $uri");
-    
-    $body = $request->getBody()->getContents();
-    
-    if (preg_match('/boundary=([^;]+)/', $contentType, $matches)) {
-      $boundary = '--' . trim($matches[1]);
-      $parts = explode($boundary, $body);
-      $_POST = [];
-      
-      foreach ($parts as $part) {
-        if (strpos($part, 'Content-Disposition: form-data') !== false) {
-          if (preg_match('/name="([^"]+)"/', $part, $nameMatches)) {
-            $fieldName = $nameMatches[1];
-            
-            // Extraer valor después de la línea vacía
-            $lines = explode("\r\n", $part);
-            $value = '';
-            $inValue = false;
-            
-            foreach ($lines as $line) {
-              if (empty($line) && !$inValue) {
-                $inValue = true;
-                continue;
-              }
-              if ($inValue) {
-                $value .= $line . "\r\n";
-              }
-            }
-            
-            $value = trim($value);
-            
-            // Limpiar headers si están incluidos
-            if (strpos($value, 'Content-Disposition:') !== false) {
-              $valueLines = explode("\r\n", $value);
-              $cleanValue = '';
-              $foundEmpty = false;
-              
-              foreach ($valueLines as $vLine) {
-                if (empty($vLine)) {
-                  $foundEmpty = true;
-                  continue;
-                }
-                if ($foundEmpty) {
-                  $cleanValue .= $vLine . "\r\n";
-                }
-              }
-              $value = trim($cleanValue);
-            }
-            
-            $_POST[$fieldName] = $value;
-          }
-        }
-      }
-    }
-  }
-  
   return $handler->handle($request);
 });
 

@@ -20,34 +20,6 @@ import "./App.css";
 
 axios.defaults.baseURL = import.meta.env.VITE_APP_API_URL;
 
-// Configurar interceptor para incluir automáticamente el token
-axios.interceptors.request.use(
-  (config) => {
-    const token = sessionStorage.getItem("token");
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
-
-// Interceptor para manejar respuestas de error de autenticación
-axios.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      // Token inválido o expirado
-      sessionStorage.removeItem("token");
-      sessionStorage.removeItem("user");
-      window.location.href = "/panel/login";
-    }
-    return Promise.reject(error);
-  }
-);
-
 function App() {
   const loading = useLoading();
   const { checkLocalAuth } = useAuth();
@@ -59,7 +31,7 @@ function App() {
  
     // Verificar autenticación local al cargar la app
     checkLocalAuth();
-  }, [checkLocalAuth]);
+  }, []);
 
   return (
     <div className="w-screen h-screen">

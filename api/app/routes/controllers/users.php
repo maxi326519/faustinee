@@ -14,8 +14,6 @@ class UsersController
   public function index(Request $request, Response $response, array $args): Response
   {
     try {
-      error_log('Getting all users');
-
       $users = Users::findAll();
       $data = array_map(function ($user) {
         return [
@@ -54,7 +52,6 @@ class UsersController
         'name' => $user->getName(),
         'email' => $user->getEmail()
       ];
-      error_log('User fetched successfully: ID ' . $id);
       $response->getBody()->write(json_encode($data));
       return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
     } catch (\Exception $e) {
@@ -89,7 +86,6 @@ class UsersController
         'name' => $newUser->getName(),
         'email' => $newUser->getEmail()
       ];
-      error_log('User created successfully: ID ' . $newUser->getId());
       $response->getBody()->write(json_encode($result));
       return $response->withHeader('Content-Type', 'application/json')->withStatus(201);
     } catch (\Exception $e) {
@@ -137,7 +133,6 @@ class UsersController
         $response->getBody()->write(json_encode(['error' => 'Failed to update user']));
         return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
       }
-      error_log('User updated successfully: ID ' . $id);
       $response->getBody()->write(json_encode(['message' => 'User updated successfully']));
       return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
     } catch (\Exception $e) {
@@ -162,7 +157,6 @@ class UsersController
         $response->getBody()->write(json_encode(['error' => 'Failed to delete user']));
         return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
       }
-      error_log('User deleted successfully: ID ' . $id);
       $response->getBody()->write(json_encode(['message' => 'User deleted successfully']));
       return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
     } catch (\Exception $e) {
