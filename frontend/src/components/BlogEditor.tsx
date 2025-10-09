@@ -48,6 +48,11 @@ const BlogEditor: React.FC<Props> = ({ data, onSave, onClose }) => {
     }
   }, [data]);
 
+  // Forzar modo claro para evitar cambios de tema
+  useEffect(() => {
+    document.documentElement.classList.remove("dark");
+  }, []);
+
   const handleChange = (key: string, value: any) => {
     setPost((prev) => ({ ...prev, [key]: value }));
   };
@@ -143,18 +148,20 @@ const BlogEditor: React.FC<Props> = ({ data, onSave, onClose }) => {
           {/* PANEL IZQUIERDO */}
           <div className="sticky divide-y flex flex-col gap-4 top-0 max-w-[1000px] w-full h-min p-4 rounded-lg border border-[#DDD] bg-white">
             {/* Toggle contenido/configuración */}
-            <div className="flex rounded-lg border border-[#DDD] bg-[#DDD]">
+            <div className="flex rounded-lg border border-gray-300 bg-gray-200">
               <Button
+                variant="ghost"
                 className={`flex-grow h-full text-lg font-semibold ${
-                  type === 1 ? "" : "hover:text-secondary bg-transparent"
+                  type === 1 ? "bg-white text-black" : "bg-transparent text-gray-700 hover:text-gray-900"
                 } shadow-none`}
                 onClick={() => setType(1)}
               >
                 Contenido
               </Button>
               <Button
+                variant="ghost"
                 className={`flex-grow h-full text-lg font-semibold ${
-                  type === 0 ? "" : "hover:text-secondary bg-transparent"
+                  type === 0 ? "bg-white text-black" : "bg-transparent text-gray-700 hover:text-gray-900"
                 } shadow-none`}
                 onClick={() => setType(0)}
               >

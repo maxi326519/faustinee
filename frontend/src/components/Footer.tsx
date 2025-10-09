@@ -108,7 +108,9 @@ function Footer() {
             <ul className="text-gray-200 text-sm font-text">
               <li>
                 <a
-                  href="mailto:edition@faustinee.com"
+                  href="https://mail.google.com/mail/?view=cm&fs=1&to=edition@faustinee.com&su=Consulta&body=Hola"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="hover:text-primary"
                 >
                   edition@faustinee.com
@@ -116,7 +118,9 @@ function Footer() {
               </li>
               <li>
                 <a
-                  href="mailto:comercial@faustinee.com"
+                  href="https://mail.google.com/mail/?view=cm&fs=1&to=comercial@faustinee.com&su=Consulta&body=Hola"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="hover:text-primary"
                 >
                   comercial@faustinee.com
@@ -124,7 +128,9 @@ function Footer() {
               </li>
               <li>
                 <a
-                  href="mailto:staff@faustinee.com"
+                  href="https://mail.google.com/mail/?view=cm&fs=1&to=staff@faustinee.com&su=Consulta&body=Hola"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="hover:text-primary"
                 >
                   staff@faustinee.com

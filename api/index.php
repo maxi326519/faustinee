@@ -18,7 +18,7 @@ if (strpos($path, '/api/uploads/') === 0) {
   // Remover /api de la ruta para obtener la ruta relativa
   $relativePath = substr($path, 4); // Remover '/api'
   $filePath = __DIR__ . '/public' . $relativePath;
-  
+
   if (file_exists($filePath) && is_file($filePath)) {
     // Determinar el tipo MIME basado en la extensión del archivo
     $extension = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
@@ -100,7 +100,10 @@ $app->add(function (Request $request, \Psr\Http\Server\RequestHandlerInterface $
   if ($request->getMethod() === 'OPTIONS') {
     $response = new Response();
     return $response
-      ->withHeader('Access-Control-Allow-Origin', '*')
+      ->withHeader(
+        'Access-Control-Allow-Origin',
+        ["https://www.faustinee.com/*", "https://faustinee.com/*", "http://localhost:5173/*"]
+      )
       ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
       ->withHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With')
       ->withHeader('Access-Control-Max-Age', '86400')
