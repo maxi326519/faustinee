@@ -25,17 +25,22 @@ export default function CoversTable() {
     }
   };
 
-  const handleUpload = async (data: { title: string; image: File | null }) => {
+  const handleUpload = async (data: {
+    title: string;
+    image: File | null;
+    date: Date;
+  }) => {
     if (!data.title || !data.image) return;
 
     const formData = new FormData();
     formData.append("title", data.title);
     formData.append("image", data.image);
+    formData.append("created_at", data.date.toISOString());
 
     try {
       await axios.post("/covers", formData, {
         headers: {
-          'Content-Type': 'multipart/form-data',
+          "Content-Type": "multipart/form-data",
         },
       });
       setIsUploadOpen(false);
@@ -141,6 +146,7 @@ export default function CoversTable() {
                   <Trash />
                 </Button>
               </div>
+              <span>{new Date(cover.created_at)?.toLocaleDateString()}</span>
             </div>
           ))}
         </div>

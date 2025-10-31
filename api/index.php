@@ -102,7 +102,8 @@ $app->add(function (Request $request, \Psr\Http\Server\RequestHandlerInterface $
     return $response
       ->withHeader(
         'Access-Control-Allow-Origin',
-        ["https://www.faustinee.com/*", "https://faustinee.com/*", "http://localhost:5173/*"]
+        '*'
+        // ["https://www.faustinee.com/*", "https://faustinee.com/*", "http://localhost:5173"]
       )
       ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
       ->withHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With')

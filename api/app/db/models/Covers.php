@@ -88,10 +88,10 @@ class Covers {
     public static function create($data) {
         $pdo = getPDO();
         $id = self::generateUuid();
-        $now = date('Y-m-d H:i:s');
+        $createdAt = isset($data['created_at']) ? $data['created_at'] : date('Y-m-d H:i:s');
         $stmt = $pdo->prepare("INSERT INTO Covers (id, title, imageUrl, state, pinned, created_at) VALUES (?, ?, ?, ?, ?, ?)");
-        $stmt->execute([$id, $data['title'], $data['imageUrl'], $data['state'], $data['pinned'], $now]);
-        return new self($id, $data['title'], $data['imageUrl'], $data['state'], $data['pinned'], $now);
+        $stmt->execute([$id, $data['title'], $data['imageUrl'], $data['state'], $data['pinned'], $createdAt]);
+        return new self($id, $data['title'], $data['imageUrl'], $data['state'], $data['pinned'], $createdAt);
     }
 
     public static function update($id, $data) {

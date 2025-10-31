@@ -1,4 +1,4 @@
-import { initUser, User, UserRol } from "@/interfaces/User";
+import { initUser, User } from "@/interfaces/User";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -26,13 +26,6 @@ export default function UserForm({ isOpen, onClose, onSubmit }: Props) {
     setFormData((prev: User) => ({
       ...prev,
       [name]: value,
-    }));
-  };
-
-  const handleRoleChange = (role: UserRol) => {
-    setFormData((prev: User) => ({
-      ...prev,
-      role,
     }));
   };
 
@@ -91,23 +84,6 @@ export default function UserForm({ isOpen, onClose, onSubmit }: Props) {
               type="password"
               placeholder="Ingrese la contraseña"
             />
-          </div>
-
-          <div>
-            <Label>Rol</Label>
-            <div className="flex gap-4">
-              {Object.values(UserRol)
-                .filter((option) => option)
-                .map((role) => (
-                  <Button
-                    key={role}
-                    variant={formData.role === role ? "default" : "secondary"}
-                    onClick={() => handleRoleChange(role)}
-                  >
-                    {role}
-                  </Button>
-                ))}
-            </div>
           </div>
 
           {/* Botones */}

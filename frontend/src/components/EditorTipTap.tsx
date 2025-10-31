@@ -16,16 +16,13 @@ import { LineHeight } from "reactjs-tiptap-editor/lineheight";
 import { Link } from "reactjs-tiptap-editor/link";
 import { ColumnActionButton } from "reactjs-tiptap-editor/multicolumn";
 import { ListItem } from "reactjs-tiptap-editor/listitem";
-import { MoreMark } from "reactjs-tiptap-editor/moremark";
 import { OrderedList } from "reactjs-tiptap-editor/orderedlist";
 import { Selection } from "reactjs-tiptap-editor/selection";
 import { Table } from "reactjs-tiptap-editor/table";
-import { TaskList } from "reactjs-tiptap-editor/tasklist";
 import { TextAlign } from "reactjs-tiptap-editor/textalign";
 import { TextBubble } from "reactjs-tiptap-editor/textbubble";
 import { TextUnderline } from "reactjs-tiptap-editor/textunderline";
 import { SearchAndReplace } from "reactjs-tiptap-editor/searchandreplace";
-import { Video } from "reactjs-tiptap-editor/video";
 import { Image } from "reactjs-tiptap-editor/image";
 import { Iframe } from "reactjs-tiptap-editor/iframe";
 
@@ -46,34 +43,37 @@ export default function EditorTiptap({ value, onChange }: Props) {
         content={value}
         onChangeContent={onChange}
         extensions={[
+          // Core/Base functionality
           BaseKit.configure({}),
-          Blockquote,
+          History,
+          
+          // Text formatting
           Bold,
+          Italic,
+          TextUnderline,
+          Color,
+          Highlight,
+          
+          // Typography
           FontSize,
           FontFamily,
-          Color,
-          Clear,
-          BulletList,
-          Heading,
-          Highlight,
-          History,
-          HorizontalRule,
-          Indent,
-          Italic,
           LineHeight,
-          Link,
-          ColumnActionButton,
-          ListItem,
-          MoreMark,
-          OrderedList,
-          Selection,
-          Table,
-          TaskList,
-          TextBubble,
-          TextUnderline,
-          SearchAndReplace,
-          Iframe,
+          Heading,
+          
+          // Text alignment and layout
           TextAlign.configure({ types: ["heading", "paragraph"] }),
+          Indent,
+          
+          // Lists
+          BulletList,
+          OrderedList,
+          ListItem,
+          
+          // Content blocks
+          Blockquote,
+          HorizontalRule,
+          
+          // Media and embeds
           Image.configure({
             upload: (file: File) => {
               return new Promise((resolve) => {
@@ -83,15 +83,20 @@ export default function EditorTiptap({ value, onChange }: Props) {
               });
             },
           }),
-          Video.configure({
-            upload: (files: File) => {
-              return new Promise((resolve) => {
-                setTimeout(() => {
-                  resolve(URL.createObjectURL(files));
-                }, 500);
-              });
-            },
-          }),
+          Iframe,
+          
+          // Tables and columns
+          Table,
+          ColumnActionButton,
+          
+          // Links and navigation
+          Link,
+          
+          // Utilities
+          Clear,
+          Selection,
+          TextBubble,
+          SearchAndReplace,
         ]}
       />
     </div>

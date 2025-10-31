@@ -1,4 +1,4 @@
-import { ArrowLeft, ArrowUpLeftFromSquare, Save, X } from "lucide-react";
+import { ArrowLeft, ArrowUpLeftFromSquare, Save } from "lucide-react";
 import { initPost, Post, PostState } from "@/interfaces/Post";
 import { useEffect, useState } from "react";
 import { cleanEscapedHtml } from "@/lib/utils";
@@ -32,19 +32,14 @@ const categories = [
 const BlogEditor: React.FC<Props> = ({ data, onSave, onClose }) => {
   const [type, setType] = useState<number>(1);
   const [post, setPost] = useState<Post>(initPost());
-  const [newTag, setNewTag] = useState<string>("");
   const [cover, setCover] = useState<File | null>(null);
   const [coverUrl, setCoverUrl] = useState<string>("");
   const [preview, setPreview] = useState<boolean>(false);
-
-  // 🔹 Convertimos tags en array para manipular más fácil
-  const [tags, setTags] = useState<string[]>([]);
 
   useEffect(() => {
     if (data) {
       setPost({ ...data, contentHtml: cleanEscapedHtml(data.contentHtml) });
       setCoverUrl(data.coverUrl);
-      setTags(data.tags ? data.tags.split(" ").filter(Boolean) : []);
     }
   }, [data]);
 
@@ -57,26 +52,8 @@ const BlogEditor: React.FC<Props> = ({ data, onSave, onClose }) => {
     setPost((prev) => ({ ...prev, [key]: value }));
   };
 
-  const handleTag = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      const value = newTag.trim();
-      if (value !== "" && !tags.includes(value)) {
-        const newTags = [...tags, value];
-        setTags(newTags);
-        setPost((prev) => ({ ...prev, tags: newTags.join(" ") }));
-        setNewTag("");
-      }
-    }
-  };
-
-  const removeTag = (tagToRemove: string) => {
-    const newTags = tags.filter((tag) => tag !== tagToRemove);
-    setTags(newTags);
-    setPost((prev) => ({ ...prev, tags: newTags.join(" ") }));
-  };
-
   const handleSave = (publish: boolean) => {
+
     if (
       publish &&
       post.title &&
@@ -84,15 +61,14 @@ const BlogEditor: React.FC<Props> = ({ data, onSave, onClose }) => {
       post.author &&
       (data?.coverUrl || (!data && cover))
     ) {
-      onSave(
-        { ...post, tags: tags.join(" "), state: PostState.PUBLICADO },
-        cover!
-      );
+      onSave({ ...post, state: PostState.PUBLICADO }, cover!);
     }
 
     if (!publish) {
-      onSave({ ...post, tags: tags.join(" ") }, cover!);
+      onSave({ ...post }, cover!);
     }
+
+    console.log("Actualizando", post);
   };
 
   const handleSetCover = (file: File | null) => {
@@ -152,7 +128,9 @@ const BlogEditor: React.FC<Props> = ({ data, onSave, onClose }) => {
               <Button
                 variant="ghost"
                 className={`flex-grow h-full text-lg font-semibold ${
-                  type === 1 ? "bg-white text-black" : "bg-transparent text-gray-700 hover:text-gray-900"
+                  type === 1
+                    ? "bg-white text-black"
+                    : "bg-transparent text-gray-700 hover:text-gray-900"
                 } shadow-none`}
                 onClick={() => setType(1)}
               >
@@ -161,7 +139,9 @@ const BlogEditor: React.FC<Props> = ({ data, onSave, onClose }) => {
               <Button
                 variant="ghost"
                 className={`flex-grow h-full text-lg font-semibold ${
-                  type === 0 ? "bg-white text-black" : "bg-transparent text-gray-700 hover:text-gray-900"
+                  type === 0
+                    ? "bg-white text-black"
+                    : "bg-transparent text-gray-700 hover:text-gray-900"
                 } shadow-none`}
                 onClick={() => setType(0)}
               >
@@ -242,9 +222,13 @@ const BlogEditor: React.FC<Props> = ({ data, onSave, onClose }) => {
                         type="date"
                         name="date"
                         value={
-                          post.date ? post.date.toString().split("T")[0] : ""
+                          post.date
+                            ? (typeof post.date === 'string' 
+                                ? post.date.split('T')[0] 
+                                : new Date(post.date).toISOString().split('T')[0])
+                            : new Date().toISOString().split('T')[0]
                         }
-                        onChange={(e) => handleChange("date", e.target.value)}
+                        onChange={(e) => handleChange("date", new Date(e.target.value))}
                       />
                     </label>
 
@@ -269,41 +253,6 @@ const BlogEditor: React.FC<Props> = ({ data, onSave, onClose }) => {
                       />
                       Fijar en su categoría
                     </label>
-                  </div>
-                </div>
-
-                {/* Tags */}
-                <div className="w-full">
-                  <label className="flex items-center gap-2">
-                    Tags
-                    <Input
-                      type="text"
-                      value={newTag}
-                      onChange={(e) => setNewTag(e.target.value)}
-                      onKeyDown={handleTag}
-                      placeholder="Presiona Enter para agregar"
-                    />
-                  </label>
-                  <div className="flex flex-wrap gap-2 w-full min-h-[50px] rounded-sm border border-[#DDD] bg-gray-100 p-2">
-                    {tags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="flex items-center gap-1 px-2 py-1 bg-secondary text-white rounded text-sm"
-                      >
-                        {tag}
-                        <button
-                          title="Eliminar tag"
-                          type="button"
-                          onClick={() => removeTag(tag)}
-                          className="ml-1"
-                        >
-                          <X size={14} />
-                        </button>
-                      </span>
-                    ))}
-                    {tags.length === 0 && (
-                      <span className="text-gray-400">Sin tags</span>
-                    )}
                   </div>
                 </div>
               </div>

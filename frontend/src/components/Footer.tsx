@@ -101,7 +101,7 @@ function Footer() {
             </div>
           </div>
 
-          <div className="px-10">
+          <div className="px-10 w-full max-w-[250px] md:max-w-[400px]">
             <h3 className="text-gray-200 text-xl font-title font-bold mb-4">
               CONTACTO
             </h3>
@@ -139,7 +139,7 @@ function Footer() {
             </ul>
           </div>
 
-          <div className="px-10">
+          <div className="px-10 w-full max-w-[250px] md:max-w-[400px]">
             <h3 className="text-gray-200 text-xl font-title font-bold mb-4">
               EQUIPO
             </h3>

@@ -21,6 +21,19 @@ class CoversController
   {
     try {
       $covers = Covers::findAll();
+
+      // Ordenar los covers: primero los fijados (pinned), luego por fecha de creación descendente
+      usort($covers, function ($a, $b) {
+        // Primero comparar por pinned (true primero)
+        if ($a->getPinned() && !$b->getPinned()) {
+          return -1;
+        } elseif (!$a->getPinned() && $b->getPinned()) {
+          return 1;
+        }
+        // Si ambos tienen el mismo estado de pinned, ordenar por created_at descendente
+        return strtotime($b->getCreatedAt()) <=> strtotime($a->getCreatedAt());
+      });
+
       $data = array_map(function ($cover) {
         $baseUrl = $this->getBaseUrl();
         $imageUrl = $cover->getImageUrl();

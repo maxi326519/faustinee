@@ -80,10 +80,25 @@ class Users {
 
     public static function create($data) {
         $pdo = getPDO();
-        $stmt = $pdo->prepare("INSERT INTO Users (name, email, password) VALUES (?, ?, ?)");
-        $stmt->execute([$data['name'], $data['email'], $data['password']]);
-        $id = $pdo->lastInsertId();
+        $id = self::generateUuid();
+        $stmt = $pdo->prepare("INSERT INTO Users (id, name, email, password) VALUES (?, ?, ?, ?)");
+        $stmt->execute([$id, $data['name'], $data['email'], $data['password']]);
         return new self($id, $data['name'], $data['email'], $data['password']);
+    }
+
+    private static function generateUuid()
+    {
+        return sprintf(
+            '%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
+            mt_rand(0, 0xffff),
+            mt_rand(0, 0xffff),
+            mt_rand(0, 0xffff),
+            mt_rand(0, 0x0fff) | 0x4000,
+            mt_rand(0, 0x3fff) | 0x8000,
+            mt_rand(0, 0xffff),
+            mt_rand(0, 0xffff),
+            mt_rand(0, 0xffff)
+        );
     }
 
     public static function update($id, $data) {

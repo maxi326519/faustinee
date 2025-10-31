@@ -347,8 +347,63 @@ class Posts
   public static function delete($id)
   {
     $pdo = getPDO();
+    
+    // Primero obtener la información del post para eliminar archivos asociados
+    $stmt = $pdo->prepare("SELECT coverUrl FROM Posts WHERE id = ?");
+    $stmt->execute([$id]);
+    $post = $stmt->fetch(\PDO::FETCH_ASSOC);
+    
+    if ($post) {
+      // Eliminar archivos asociados
+      self::deletePostFiles($id, $post['coverUrl']);
+    }
+    
+    // Eliminar el post de la base de datos
     $stmt = $pdo->prepare("DELETE FROM Posts WHERE id = ?");
     return $stmt->execute([$id]);
+  }
+
+  private static function deletePostFiles($postId, $coverUrl)
+  {
+    try {
+      // Eliminar carpeta de imágenes del post
+      $postsFolder = __DIR__ . '/../../../public/uploads/posts/' . $postId;
+      if (is_dir($postsFolder)) {
+        self::deleteDirectory($postsFolder);
+      }
+      
+      // Eliminar imagen de portada si existe
+      if (!empty($coverUrl)) {
+        // Extraer el nombre del archivo de la URL
+        $coverPath = parse_url($coverUrl, PHP_URL_PATH);
+        if ($coverPath) {
+          $fullCoverPath = __DIR__ . '/../../../public' . $coverPath;
+          if (file_exists($fullCoverPath)) {
+            unlink($fullCoverPath);
+          }
+        }
+      }
+    } catch (\Exception $e) {
+      error_log('Error deleting post files: ' . $e->getMessage());
+    }
+  }
+
+  private static function deleteDirectory($dir)
+  {
+    if (!is_dir($dir)) {
+      return false;
+    }
+    
+    $files = array_diff(scandir($dir), array('.', '..'));
+    foreach ($files as $file) {
+      $path = $dir . '/' . $file;
+      if (is_dir($path)) {
+        self::deleteDirectory($path);
+      } else {
+        unlink($path);
+      }
+    }
+    return rmdir($dir);
   }
 
   private static function generateUuid()

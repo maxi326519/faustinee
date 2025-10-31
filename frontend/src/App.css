@@ -42,6 +42,10 @@ h6 {
   display: none;
 }
 
+.Nota table colgroup {
+  width: 500px !important;
+}
+
 .ProseMirror img,
 .Nota img {
   border-radius: 5px;

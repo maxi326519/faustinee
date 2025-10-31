@@ -158,7 +158,7 @@ export default function PostTable() {
           </span>
         ),
       },
-/*       {
+      {
         key: "fixed",
         label: "Fijado",
         render: (post: Post) => (
@@ -188,7 +188,7 @@ export default function PostTable() {
             )}
           </div>
         ),
-      }, */
+      },
       {
         key: "date",
         label: "Fecha",

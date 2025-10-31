@@ -7,10 +7,10 @@ interface Props {
   posts: Array<Post[]>;
 }
 
-const iframes = [
-  "https://www.youtube.com/watch?v=ixCUD5Z-lBs",
+const videos = [
   "https://www.youtube.com/watch?v=EFRKMLQRWkw&sttick=0",
-  "https://www.youtube.com/watch?v=nks0I_5ChaY",
+  "https://youtu.be/d8t946x5Q_E?si=GpaFB7t5L0VbxtN3",
+  "https://www.faustinee.com/api/uploads/files/victoria-secret.mp4",
 ];
 
 export default function CategoriesSection({ posts }: Props) {
@@ -54,19 +54,28 @@ export default function CategoriesSection({ posts }: Props) {
       </div>
 
       <div className="flex flex-col md:flex-row gap-6 w-full m-x-auto p-4 border-t border-dashed border-[#DDD]">
-        {iframes.map((url, idx) => (
+        {videos.map((url, idx) => (
           <div
             key={idx}
             className="relative flex justify-center items-center w-full pb-[52%] md:pb-[26%] h-0 overflow-hidden shadow-lg"
           >
-            <iframe
-              src={toEmbedUrl(url)}
-              title={`YouTube video ${idx + 1}`}
-              frameBorder="0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-              className="absolute top-0 left-0 w-full h-full"
-            />
+            {url.includes(".mp4") ? (
+              <video
+                src={url}
+                title={`Video ${idx + 1}`}
+                controls
+                className="absolute top-0 left-0 w-full h-full"
+              />
+            ) : (
+              <iframe
+                src={toEmbedUrl(url)}
+                title={`YouTube video ${idx + 1}`}
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                className="absolute top-0 left-0 w-full h-full"
+              />
+            )}
           </div>
         ))}
       </div>

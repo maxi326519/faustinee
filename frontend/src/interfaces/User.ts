@@ -21,7 +21,7 @@ export enum UserStatus {
 
 export const initUser = (): User => ({
   name: "",
+  email: "",
   role: UserRol.Admin,
   status: UserStatus.ACTIVE,
-  email: "",
 });

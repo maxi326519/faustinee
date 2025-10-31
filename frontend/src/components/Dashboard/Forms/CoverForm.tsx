@@ -7,13 +7,11 @@ import Modal from "@/components/Modal";
 interface CoverFormProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (data: {
-    title: string;
-    image: File | null;
-  }) => void;
+  onSubmit: (data: { title: string; image: File | null; date: Date }) => void;
   initialData?: {
     title: string;
     image: File | null;
+    date: Date;
   };
 }
 
@@ -26,6 +24,7 @@ export default function CoverForm({
   const [formData, setFormData] = useState({
     title: initialData?.title || "",
     image: initialData?.image || null,
+    date: new Date(),
   });
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -57,6 +56,7 @@ export default function CoverForm({
     setFormData({
       title: "",
       image: null,
+      date: new Date(),
     });
     setImagePreview(null);
     onClose();
@@ -84,6 +84,19 @@ export default function CoverForm({
             }
             className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             required
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium mb-1">Fecha</label>
+          <input
+            type="date"
+            onChange={(e) => {
+              const date = new Date(e.target.value);
+              if (!isNaN(date.getTime()))
+                setFormData((prev) => ({ ...prev, date }));
+            }}
+            className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
 

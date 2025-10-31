@@ -58,7 +58,7 @@ class PostsController
   private function handleCoverUpload($uploadedFile)
   {
     try {
-      $folder = __DIR__ . '/../../../public/uploads/covers';
+      $folder = __DIR__ . '/../../../public/uploads/posts';
       if (!is_dir($folder)) {
         mkdir($folder, 0755, true);
       }
@@ -172,6 +172,7 @@ class PostsController
     $state = $data['state'] ?? 'Borrador';
     $author = $data['author'] ?? '';
     $tags = $data['tags'] ?? '';
+    $date = $data['date'] ?? date('Y-m-d');
 
     if (empty($title) || empty($contentHtml)) {
       $response->getBody()->write(json_encode(['error' => 'Title and contentHtml are required']));
@@ -188,12 +189,13 @@ class PostsController
       // Preparar datos para crear el post
       $postData = [
         'title' => $title,
-        'contentHtml' => $contentHtml,
         'category' => $category,
+        'contentHtml' => $contentHtml,
+        'coverUrl' => $coverUrl,
+        'tags' => $tags,
         'state' => $state,
         'author' => $author,
-        'tags' => $tags,
-        'coverUrl' => $coverUrl,
+        'date' => $date,
         'fixedHome' => isset($data['fixedHome']) && ($data['fixedHome'] === 'true' || $data['fixedHome'] === true) ? 1 : 0,
         'fixedCategory' => isset($data['fixedCategory']) && ($data['fixedCategory'] === 'true' || $data['fixedCategory'] === true) ? 1 : 0,
         'slug' => $data['slug'] ?? ''
@@ -242,7 +244,6 @@ class PostsController
     // Obtener datos del JSON body
     $data = $request->getParsedBody();
 
-
     $title = $data['title'] ?? '';
     $contentHtml = $data['contentHtml'] ?? '';
 
@@ -255,15 +256,16 @@ class PostsController
       // Preparar datos para actualizar el post (ya incluye coverUrl del frontend)
       $updateData = [
         'title' => $title,
-        'contentHtml' => $contentHtml,
         'category' => $data['category'] ?? '',
+        'contentHtml' => $contentHtml,
+        'coverUrl' => $data['coverUrl'] ?? '',
+        'tags' => $data['tags'] ?? '',
         'state' => $data['state'] ?? 'Borrador',
         'author' => $data['author'] ?? '',
-        'tags' => $data['tags'] ?? '',
+        'date' => $data['date'] ?? date('Y-m-d'),
         'fixedHome' => $data['fixedHome'] === true || $data['fixedHome'] === 'true' ? 1 : 0,
         'fixedCategory' => $data['fixedCategory'] === true || $data['fixedCategory'] === 'true' ? 1 : 0,
         'slug' => $data['slug'] ?? '',
-        'coverUrl' => $data['coverUrl'] ?? ''
       ];
 
       // Generar slug automáticamente si está vacío
