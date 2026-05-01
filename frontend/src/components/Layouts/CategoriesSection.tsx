@@ -8,9 +8,8 @@ interface Props {
 }
 
 const videos = [
-  "https://www.youtube.com/watch?v=EFRKMLQRWkw&sttick=0",
-  "https://youtu.be/d8t946x5Q_E?si=GpaFB7t5L0VbxtN3",
-  "https://www.faustinee.com/api/uploads/files/victoria-secret.mp4",
+  "https://faustinee.com/videos/video-1.mp4",
+  "https://faustinee.com/videos/video-2.mp4"
 ];
 
 export default function CategoriesSection({ posts }: Props) {
