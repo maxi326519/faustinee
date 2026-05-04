@@ -5,6 +5,7 @@ import logoFaustinee from "@/assets/logo-horizontral-transparent.png";
 import logoLoreal from "@/assets/empresas/Loreal-Paris.jpg";
 import logoMoet from "@/assets/empresas/moet-logo.jpg";
 import logoCartier from "@/assets/empresas/logo-cartier.jpeg";
+import logoBlueTailored from "@/assets/empresas/unnamed.jpg";
 
 function Footer() {
   return (
@@ -48,6 +49,13 @@ function Footer() {
               >
                 <img className="h-full" src={logoLoreal} alt="logo-Loreal" />
               </a>
+              <div className="flex items-center justify-center h-[80px]">
+                <img
+                  className="h-full w-auto max-w-[220px] object-contain"
+                  src={logoBlueTailored}
+                  alt="Blue Tailored Co."
+                />
+              </div>
             </div>
           </div>
         </div>

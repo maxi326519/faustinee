@@ -19,6 +19,32 @@ interface Cover {
   pinned: boolean;
 }
 
+function parseCoversPayload(data: unknown): Cover[] {
+  if (Array.isArray(data)) return data;
+  if (
+    data &&
+    typeof data === "object" &&
+    "items" in data &&
+    Array.isArray((data as { items: unknown }).items)
+  ) {
+    return (data as { items: Cover[] }).items;
+  }
+  return [];
+}
+
+function parsePinnedCover(data: unknown): Cover | null {
+  if (
+    data &&
+    typeof data === "object" &&
+    data !== null &&
+    "imageUrl" in data &&
+    typeof (data as Cover).imageUrl === "string"
+  ) {
+    return data as Cover;
+  }
+  return null;
+}
+
 export default function Home() {
   const posts = usePosts();
   const [covers, setCovers] = useState<Cover[]>([]);
@@ -32,15 +58,15 @@ export default function Home() {
 
   const fetchCovers = async () => {
     try {
-      // Obtener todas las portadas
       const response = await axios.get("/covers");
-      setCovers(response.data);
+      setCovers(parseCoversPayload(response.data));
 
-      // Obtener la portada fijada más reciente
       const pinnedResponse = await axios.get("/covers/pinned");
-      setPinnedCover(pinnedResponse.data);
+      setPinnedCover(parsePinnedCover(pinnedResponse.data));
     } catch (error) {
       console.error("Failed to fetch covers:", error);
+      setCovers([]);
+      setPinnedCover(null);
     }
   };
 
@@ -115,7 +141,7 @@ export default function Home() {
       <div className="w-full border-b border-[#DDD]" />
 
       <NewsSection
-        posts={posts.latest.slice(4, posts.latest.length)}
+        posts={(posts.latest ?? []).slice(4)}
         covers={covers}
       />
       <Footer />

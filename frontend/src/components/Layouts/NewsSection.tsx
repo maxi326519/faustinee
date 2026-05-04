@@ -20,7 +20,8 @@ interface Props {
 export default function NewsSection({ posts, covers }: Props) {
   const [coverIndex, setCoverIndex] = useState<number | null>(null);
 
-  const publishedCovers = covers.filter(c => c.state === 'Publicado');
+  const coverList = Array.isArray(covers) ? covers : [];
+  const publishedCovers = coverList.filter((c) => c.state === "Publicado");
 
   return (
     <section className="flex flex-col md:flex-row gap-4 m-auto max-w-[1200px] w-full overflow-hidden">

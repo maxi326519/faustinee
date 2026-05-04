@@ -160,7 +160,7 @@ export function usePosts() {
 
       // Must Reads
       const mustReadsResponse = await axios.get(
-        `/posts?page=1&items=3&mustReads=true&state=Publicado`
+        `/posts?page=1&items=3&mustRead=true&state=Publicado`
       );
       if (
         !mustReadsResponse.data ||
