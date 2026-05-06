@@ -5,7 +5,7 @@ import logoFaustinee from "@/assets/logo-horizontral-transparent.png";
 import logoLoreal from "@/assets/empresas/Loreal-Paris.jpg";
 import logoMoet from "@/assets/empresas/moet-logo.jpg";
 import logoCartier from "@/assets/empresas/logo-cartier.jpeg";
-import logoBlueTailored from "@/assets/empresas/unnamed.jpg";
+import logoBlueTailored from "@/assets/empresas/blue.png";
 
 function Footer() {
   return (
@@ -49,13 +49,20 @@ function Footer() {
               >
                 <img className="h-full" src={logoLoreal} alt="logo-Loreal" />
               </a>
-              <div className="flex items-center justify-center h-[80px]">
-                <img
-                  className="h-full w-auto max-w-[220px] object-contain"
-                  src={logoBlueTailored}
-                  alt="Blue Tailored Co."
-                />
-              </div>
+              <a
+                rel="noopener noreferrer"
+                className="flex items-center justify-center h-[80px] cursor-pointer"
+                href="https://www.instagram.com/bluetailoredclothing/?hl=en"
+                target="_blank"
+              >
+                <div className="flex items-center justify-center h-[80px]">
+                  <img
+                    className="h-full w-auto max-w-[220px] object-contain"
+                    src={logoBlueTailored}
+                    alt="Blue Tailored Co."
+                  />
+                </div>
+              </a>
             </div>
           </div>
         </div>

@@ -54,8 +54,8 @@ const Nota = ({ id, post }: Props) => {
 
       {/* Título principal */}
       <header className="max-w-[1000px] mx-auto text-gray-800 px-6 pt-10 text-center">
-        <h1 className="CustomFont text-5xl md-text-5xl font-title">
-          {currentPost?.title}
+        <h1 className="text-gray-800 font-title font-bold leading-tight text-2xl md:text-3xl lg:text-4xl">
+          {currentPost?.title?.toUpperCase()}
         </h1>
         <div className="h-1 w-20 bg-primary mx-auto mt-4 rounded-full" />
         <p className="w-full mt-6 mb-4 text-start text-sm text-gray-400">
