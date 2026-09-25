@@ -2,29 +2,27 @@ import { Facebook, Instagram, Twitter } from "lucide-react";
 
 import logoFaustinee from "@/assets/logo-horizontral-transparent.png";
 // import logoPuma from "@/assets/empresas/Puma-Logo-768x432.png";
-import logoLoreal from "@/assets/empresas/Loreal-Paris.jpg";
-import logoMoet from "@/assets/empresas/moet-logo.jpg";
-import logoCartier from "@/assets/empresas/logo-cartier.jpeg";
-import logoBlueTailored from "@/assets/empresas/blue.png";
+// import logoLoreal from "@/assets/empresas/Loreal-Paris.jpg";
+// import logoMoet from "@/assets/empresas/moet-logo.jpg";
+// import logoCartier from "@/assets/empresas/logo-cartier.jpeg";
 
 function Footer() {
   return (
     <footer className="text-gray-900 w-full border-t border-[#DDD]">
-      <div className="py-14">
+{/*       <div className="py-14">
         <h3 className="CustomFont text-5xl text-center font-title font-bold mb-6">
           Nos Acompañan
         </h3>
         <div className="overflow-x-auto">
           <div className="flex justify-center p-4 w-max m-auto">
             <div className="flex gap-6 w-max">
-              {/* Logos de partners - reemplaza con tus imágenes */}
-              {/*               <a
+              <a
                 className="flex items-center justify-center h-[80px] cursor-pointer"
                 href="https://ar.puma.com/"
                 target="_blank"
               >
                 <img className="h-full" src={logoPuma} alt="logo-Puma" />
-              </a> */}
+              </a>
               <a
                 rel="noopener noreferrer"
                 className="flex items-center justify-center h-[80px] cursor-pointer"
@@ -49,24 +47,10 @@ function Footer() {
               >
                 <img className="h-full" src={logoLoreal} alt="logo-Loreal" />
               </a>
-              <a
-                rel="noopener noreferrer"
-                className="flex items-center justify-center h-[80px] cursor-pointer"
-                href="https://www.instagram.com/bluetailoredclothing/?hl=en"
-                target="_blank"
-              >
-                <div className="flex items-center justify-center h-[80px]">
-                  <img
-                    className="h-full w-auto max-w-[220px] object-contain"
-                    src={logoBlueTailored}
-                    alt="Blue Tailored Co."
-                  />
-                </div>
-              </a>
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
 
       <div className="border-t border-gray-200 bg-black text-white">
         <div className="flex flex-col md:flex-row items-center justify-between mx-auto gap-10 md:px-8 py-8 px-4 max-w-6xl">
