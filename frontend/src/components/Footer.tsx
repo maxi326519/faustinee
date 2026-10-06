@@ -6,30 +6,30 @@ import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import logoFaustinee from "@/assets/logo-horizontral-transparent.png";
 import biografia from "@/assets/biografia.png";
 // import logoPuma from "@/assets/empresas/Puma-Logo-768x432.png";
-import logoLoreal from "@/assets/empresas/Loreal-Paris.jpg";
-import logoMoet from "@/assets/empresas/moet-logo.jpg";
-import logoCartier from "@/assets/empresas/logo-cartier.jpeg";
+// import logoLoreal from "@/assets/empresas/Loreal-Paris.jpg";
+// import logoMoet from "@/assets/empresas/moet-logo.jpg";
+// import logoCartier from "@/assets/empresas/logo-cartier.jpeg";
 
 function Footer() {
   const [bioVisible, setBioVisible] = useState(false);
 
   return (
     <footer className="text-gray-900 w-full border-t border-[#DDD]">
-      <div className="py-14">
+      {/* Logos de partners - reemplaza con tus imágenes */}
+      {/* <div className="py-14">
         <h3 className="CustomFont text-5xl text-center font-title font-bold mb-6">
           Nos Acompañan
         </h3>
         <div className="overflow-x-auto">
           <div className="flex justify-center p-4 w-max m-auto">
             <div className="flex gap-6 w-max">
-              {/* Logos de partners - reemplaza con tus imágenes */}
-              {/*               <a
+              <a
                 className="flex items-center justify-center h-[80px] cursor-pointer"
                 href="https://ar.puma.com/"
                 target="_blank"
               >
                 <img className="h-full" src={logoPuma} alt="logo-Puma" />
-              </a> */}
+              </a>
               <a
                 rel="noopener noreferrer"
                 className="flex items-center justify-center h-[80px] cursor-pointer"
@@ -57,7 +57,7 @@ function Footer() {
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
 
       <div className="border-t border-gray-200 bg-black text-white">
         <div className="flex flex-col md:flex-row items-center justify-between mx-auto gap-10 md:px-8 py-8 px-4 max-w-6xl">
