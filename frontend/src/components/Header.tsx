@@ -31,9 +31,9 @@ export default function Header({ categorySelected }: Props) {
   const activeKey = categorySelected ?? "inicio";
 
   return (
-    <header className="relative w-full font-text bg-black">
+    <header className="relative w-full font-text bg-white">
       {/* Logo + redes */}
-      <div className="bg-black">
+      <div className="bg-white">
         <div className="relative flex items-center justify-center md:justify-between max-w-[1200px] md:m-auto">
           <div className="flex justify-center items-center mx-auto mt-16 md:mt-4 my-4 h-[100px] overflow-hidden">
             <img className="h-full object-cover" src={logo} alt="logo" />
