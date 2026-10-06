@@ -1,13 +1,18 @@
+import { useState } from "react";
 import { Facebook, Instagram, Twitter } from "lucide-react";
 
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+
 import logoFaustinee from "@/assets/logo-horizontral-transparent.png";
+import biografia from "@/assets/biografia.png";
 // import logoPuma from "@/assets/empresas/Puma-Logo-768x432.png";
 import logoLoreal from "@/assets/empresas/Loreal-Paris.jpg";
 import logoMoet from "@/assets/empresas/moet-logo.jpg";
 import logoCartier from "@/assets/empresas/logo-cartier.jpeg";
-import logoBlueTailored from "@/assets/empresas/blue.png";
 
 function Footer() {
+  const [bioVisible, setBioVisible] = useState(false);
+
   return (
     <footer className="text-gray-900 w-full border-t border-[#DDD]">
       <div className="py-14">
@@ -48,20 +53,6 @@ function Footer() {
                 target="_blank"
               >
                 <img className="h-full" src={logoLoreal} alt="logo-Loreal" />
-              </a>
-              <a
-                rel="noopener noreferrer"
-                className="flex items-center justify-center h-[80px] cursor-pointer"
-                href="https://www.instagram.com/bluetailoredclothing/?hl=en"
-                target="_blank"
-              >
-                <div className="flex items-center justify-center h-[80px]">
-                  <img
-                    className="h-full w-auto max-w-[220px] object-contain"
-                    src={logoBlueTailored}
-                    alt="Blue Tailored Co."
-                  />
-                </div>
               </a>
             </div>
           </div>
@@ -160,9 +151,16 @@ function Footer() {
             </h3>
             <div className="m-auto md:m-0 max-w-[250px] font-text text-xs">
               <p className="text-gray-200 mb-2">Edición General: Mónica Brun</p>
-              <p className="text-gray-200">
+              <p className="text-gray-200 mb-2">
                 Redactores, Productores y Periodistas: Equipo Revista Faustinee
               </p>
+              <button
+                type="button"
+                onClick={() => setBioVisible(true)}
+                className="text-gray-200 underline underline-offset-4 hover:text-primary transition duration-300 cursor-pointer"
+              >
+                Biografía
+              </button>
             </div>
           </div>
         </div>
@@ -172,6 +170,20 @@ function Footer() {
           Faustinee © {new Date().getFullYear()}
         </div>
       </div>
+
+      {/* Popup de biografía */}
+      <Dialog open={bioVisible} onOpenChange={setBioVisible}>
+        <DialogContent className="max-w-[92vw] sm:max-w-[520px] max-h-[90vh] overflow-y-auto border-none bg-transparent p-0 shadow-none [&>button]:right-2 [&>button]:top-2 [&>button]:rounded-full [&>button]:bg-white [&>button]:p-1 [&>button]:text-black [&>button]:opacity-80 [&>button]:shadow hover:[&>button]:opacity-100">
+          <DialogTitle className="sr-only">
+            Biografía de Mónica Brun
+          </DialogTitle>
+          <img
+            src={biografia}
+            alt="Biografía de Mónica Brun"
+            className="w-full h-auto rounded-md"
+          />
+        </DialogContent>
+      </Dialog>
     </footer>
   );
 }
